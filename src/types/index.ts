@@ -1,5 +1,4 @@
-import { Appointment } from "./_appointment";
-import { Agent } from "./_agent";
+import { Appointment, Agent } from "./_airtables";
 
 export {
     Appointment,

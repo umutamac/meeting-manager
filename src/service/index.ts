@@ -1,5 +1,6 @@
-import { AppointmentService as Appointment } from "./appointment.service"
+import { AppointmentService as Appointment, AgentService as Agent } from "./airtables.service"
 
 export const SERVICE = {
-    Appointment
+    Appointment,
+    Agent
 };

@@ -11,7 +11,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, defineProps } from "vue";
 import type { Appointment } from "../types";
-import { APPOINTMENT } from "../utils";
+import { APPOINTMENT, COMMON } from "../utils";
 
 type Props = { _appointment: Appointment.Model };
 
@@ -20,7 +20,7 @@ const props = defineProps<Props>();
 const appointment = ref<Appointment.Model>(APPOINTMENT.build());
 
 onMounted(() => {
-    appointment.value = props._appointment
+    appointment.value = COMMON.deepCopy(props._appointment);
 })
 </script>
 

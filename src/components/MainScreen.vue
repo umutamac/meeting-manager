@@ -3,7 +3,7 @@
         <div class="filtersSection">
             <!-- agents -->
             <div style="display: flex;">
-                <div v-for="agent, i in agents" :key="`agent_${i}`">{{ agent }}</div>
+                <div v-for="a, i in _agents" :key="`agent_${i}`"></div>
             </div>
             <!-- status -->
             <div></div>
@@ -30,28 +30,47 @@
 <script lang="ts" setup>
 import { ref, onMounted, computed } from "vue";
 //import type { Appointment } from "../types";
-import { APPOINTMENT } from "../utils";
+//import { APPOINTMENT } from "../utils";
+import { SERVICE } from "../service";
 
-const appointments = ref([]);
 
-const agents = ref(["aa", "bb"])
+//const _appointments = ref<any[]>([]);
+const _agents = ref<any[]>([])
 
-const filter = ref({
-    searchText: "",
-    dates: {
-        from: Date.now(),
-        to: Date.now() + 7 * 24 * 60 * 60 * 1000
-    },
-    agents: []
-})
+// const _filter = ref({
+//     searchText: "",
+//     dates: {
+//         from: Date.now(),
+//         to: Date.now() + 7 * 24 * 60 * 60 * 1000
+//     },
+//     agents: []
+// })
 
+const fetchAppointments = async (offset: number) => {
+    const appointments = await SERVICE.Appointment.fetch(offset);
+    
+    // console.log("fetchAppointments resp", records);
+    console.log("appointments", appointments);
+
+    //_appointments.value = appointments;
+}
+
+const fetchAgents = async () => {
+    const resp = await SERVICE.Agent.fetch();
+    console.log("fetchAgents resp", resp);
+    //agents.value = resp
+}
+
+const init = async () => {
+    await Promise.all([fetchAppointments(0), fetchAgents()]);
+}
 const filteredAppointments = computed(() => {
-    const filtered = appointments.value.filter(a => APPOINTMENT.filter(a, filter.value.searchText, filter.value.dates));
-    return filtered;
+    // const filtered = _appointments.value.filter(a => APPOINTMENT.filter(a, _filter.value.searchText, _filter.value.dates));
+    return [];
 })
 
 onMounted(() => {
-    // fetch appointments
+    init();
 })
 </script>
 
