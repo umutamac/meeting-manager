@@ -2,9 +2,7 @@
     <div class="container">
         <div class="filtersSection">
             <!-- agents -->
-            <div style="display: flex;">
-                <div v-for="a, i in _agents" :key="`agent_${i}`"></div>
-            </div>
+            <AgentAvatarList :agents="_agents" :l2r="true" :limit="3"/>
             <!-- status -->
             <div></div>
             <!-- dates -->
@@ -19,6 +17,8 @@
         </div>
 
         <div class="list">
+            <ListItem />
+
             <div v-for="a, i in filteredAppointments" :key="`app_${i}`">
                 <ListItem />
             </div>
@@ -29,13 +29,29 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, computed } from "vue";
-//import type { Appointment } from "../types";
+import type { Agent } from "../types";
 //import { APPOINTMENT } from "../utils";
 import { SERVICE } from "../service";
 
 
 //const _appointments = ref<any[]>([]);
-const _agents = ref<any[]>([])
+const _agents = ref<Agent.Model[]>([
+    {
+        firstName: "Aysun",
+        lastName: "Alptekin",
+        color: "red"
+    },
+    {
+        firstName: "Nuri",
+        lastName: "Alptekin",
+        color: "blue"
+    },
+    {
+        firstName: "Berat",
+        lastName: "Alptekin",
+        color: "green"
+    }
+])
 
 // const _filter = ref({
 //     searchText: "",

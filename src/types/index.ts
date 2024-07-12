@@ -1,6 +1,7 @@
-import { Appointment, Agent } from "./_airtables";
+import { AirTables } from "./_airtables";
+import { Agent } from "./_agent";
 
 export {
-    Appointment,
+    AirTables,
     Agent
 }

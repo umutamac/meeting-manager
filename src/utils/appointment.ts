@@ -1,4 +1,3 @@
-import { Appointment } from "../types"
 
 export module APPOINTMENT {
     // export function build(): Appointment.Model {

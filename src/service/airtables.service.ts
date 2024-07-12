@@ -1,5 +1,5 @@
 import Airtable from 'airtable';
-import { Appointment, Agent } from "../types"
+import { AirTables, Agent } from "../types";
 const apiKey = process.env.VUE_APP_AIR_TABLES_API_TOKEN;
 const baseID = process.env.VUE_APP_AIR_TABLES_BASE_ID;
 
@@ -13,19 +13,20 @@ export module AppointmentService {
     try {
       const records = await base(tableName).select({ pageSize, offset }).firstPage();
       console.log("AppointmentService fetch", records);
-      const appointments: Appointment.Model[] = records.map(r => {
-        return {
-          record_id: r.id,
-          appointment_id: r.fields.appointment_id || "",
-          appointment_date: r.fields.appointment_date || 0,
-          appointment_address: r.fields.appointment_address ||"",
-          contact_id: r.fields.contact_id || "",
-          contact_name: r.fields.contact_name || [""],
-          contact_surname: r.fields.contact_surname ||[""],
-          contact_phone: r.fields.contact_phone || [],
-          is_cancelled: !!r.fields.is_cancelled
-        }
-      });
+      // const appointments: Appointment.Model[] = records.map(r => {
+      //   return {
+      //     record_id: r.id,
+      //     appointment_id: r.fields.appointment_id || "",
+      //     appointment_date: r.fields.appointment_date || 0,
+      //     appointment_address: r.fields.appointment_address ||"",
+      //     contact_id: r.fields.contact_id || "",
+      //     contact_name: r.fields.contact_name || [""],
+      //     contact_surname: r.fields.contact_surname ||[""],
+      //     contact_phone: r.fields.contact_phone || [],
+      //     is_cancelled: !!r.fields.is_cancelled
+      //   }
+      // });
+      const appointments: any[] = [];
       return appointments;
     } catch (error) {
       console.error('Error fetching records from Airtable:', error);

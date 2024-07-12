@@ -1,0 +1,58 @@
+<template>
+    <div class="formContainer">
+        <div>{{ title }}</div>
+        <!-- search -->
+        <div></div>
+        <!-- address -->
+        <div></div>
+        <!-- agent -->
+        <div></div>
+        <!-- date -->
+        <div></div>
+    </div>
+</template>
+
+<script lang="ts" setup>
+import { defineProps, onMounted, computed } from "vue";
+//import { APPOINTMENT } from "../utils";
+
+
+//const _appointments = ref<any[]>([]);
+
+type Props = {
+    appointment?: any;
+    contacts: any[]
+    agents: any[]
+}
+const props = defineProps<Props>()
+
+//const appointment =
+// const fetchAgents = async () => {
+//     const resp = await SERVICE.Agent.fetch();
+//     console.log("fetchAgents resp", resp);
+//     //agents.value = resp
+// }
+
+// const init = async () => {
+//     //await Promise.all([fetchAppointments(0), fetchAgents()]);
+// }
+
+const title = computed<string>(() => {
+    const action = props.appointment ? "Edit" : "Add";
+    return `${action} an Appointment`;
+});
+
+
+onMounted(() => {
+    //init();
+});
+</script>
+
+<style scoped>
+    .formContainer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
