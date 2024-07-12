@@ -75,7 +75,7 @@ export module AgentService {
       const agents = records.map(r => {
         return {
           record_id: r.id,
-          ...r.fields
+          //...r.fields
         }
       });
       return agents;

@@ -2,7 +2,7 @@
     <div class="container">
         <div class="filtersSection">
             <!-- agents -->
-            <AgentAvatarList :agents="_agents" :l2r="true" :limit="3"/>
+            <AgentAvatarList :agents="_agents" :l2r="false" :limit="3" />
             <!-- status -->
             <div></div>
             <!-- dates -->
@@ -17,11 +17,7 @@
         </div>
 
         <div class="list">
-            <ListItem />
-
-            <div v-for="a, i in filteredAppointments" :key="`app_${i}`">
-                <ListItem />
-            </div>
+            <AppointmentListItem v-for="app, i in filteredAppointments" :key="`appointment_${i}`" :appointment="app" />
         </div>
 
     </div>
@@ -29,12 +25,10 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, computed } from "vue";
-import type { Agent } from "../types";
+import type { Agent, Appointment } from "../types";
 //import { APPOINTMENT } from "../utils";
 import { SERVICE } from "../service";
 
-
-//const _appointments = ref<any[]>([]);
 const _agents = ref<Agent.Model[]>([
     {
         firstName: "Aysun",
@@ -50,8 +44,72 @@ const _agents = ref<Agent.Model[]>([
         firstName: "Berat",
         lastName: "Alptekin",
         color: "green"
+    },
+    {
+        firstName: "Ayşe",
+        lastName: "Alptekin",
+        color: "pink"
+    },
+    {
+        firstName: "Nurettin",
+        lastName: "Alptekin",
+        color: "beige"
     }
 ])
+
+const appointments = ref<Appointment.Model[]>([
+    {
+        firstName: "Umut",
+        surName: "Alptekin",
+        email: "umut@testinvite.com",
+        phone: "90 555 444 11 22",
+        address: "55 South Western Terrace, Michigan 11111",
+        date: 1625140800000,
+        agents: [
+            {
+                firstName: "Aysun",
+                lastName: "Alptekin",
+                color: "red"
+            },
+            {
+                firstName: "Nuri",
+                lastName: "Alptekin",
+                color: "blue"
+            }
+        ]
+    },
+    {
+        firstName: "Amaç",
+        surName: "Alptekin",
+        email: "umut@testinvite.com",
+        phone: "90 555 999 11 11",
+        address: "123 Sunday Vista Street 12345",
+        date: 1752361115000,
+        agents: [
+            {
+                firstName: "Berat",
+                lastName: "Alptekin",
+                color: "pink"
+            },
+            {
+                firstName: "Nuri",
+                lastName: "Alptekin",
+                color: "blue"
+            },
+            {
+                firstName: "Nurettin",
+                lastName: "Alptekin",
+                color: "teal"
+            },
+            {
+                firstName: "Nurettin",
+                lastName: "Alptekin",
+                color: "beige"
+            }
+        ]
+    }
+]);
+
 
 // const _filter = ref({
 //     searchText: "",
@@ -63,10 +121,10 @@ const _agents = ref<Agent.Model[]>([
 // })
 
 const fetchAppointments = async (offset: number) => {
-    const appointments = await SERVICE.Appointment.fetch(offset);
-    
+    const _appointments = await SERVICE.Appointment.fetch(offset);
+
     // console.log("fetchAppointments resp", records);
-    console.log("appointments", appointments);
+    console.log("appointments", _appointments);
 
     //_appointments.value = appointments;
 }
@@ -81,8 +139,8 @@ const init = async () => {
     await Promise.all([fetchAppointments(0), fetchAgents()]);
 }
 const filteredAppointments = computed(() => {
-    // const filtered = _appointments.value.filter(a => APPOINTMENT.filter(a, _filter.value.searchText, _filter.value.dates));
-    return [];
+    return appointments.value;
+    //const filtered = appointments.value.filter(a => APPOINTMENT.filter(a, _filter.value.searchText, _filter.value.dates));
 })
 
 onMounted(() => {
@@ -113,5 +171,15 @@ onMounted(() => {
 
 .list {
     padding: 20px;
+}
+
+.list>div {
+    border: 1px black solid;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+.list> :nth-child(odd) {
+    background-color: aquamarine;
 }
 </style>

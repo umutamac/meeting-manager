@@ -42,7 +42,7 @@ export module COMMON {
 
         // Convert milliseconds to days
         const msInDay = 24 * 60 * 60 * 1000;
-        const diffInDays = diffInMs / msInDay;
+        const diffInDays = Math.floor(diffInMs / msInDay);
 
         return diffInDays;
     }
