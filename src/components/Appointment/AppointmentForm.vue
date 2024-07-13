@@ -4,16 +4,22 @@
         <!-- search -->
         <div></div>
         <!-- address -->
-        <div></div>
+        <div>
+            <v-text-field v-model="form.address" label="Address"></v-text-field>
+        </div>
         <!-- agent -->
-        <div></div>
+        <div>
+            <v-select multiple v-model="form.agents" :items="agents" label="Agent"></v-select>
+        </div>
         <!-- date -->
-        <div></div>
+        <div>
+            <v-date-picker v-model="form.date" label="Date date"></v-date-picker>
+        </div>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { defineProps, onMounted, computed } from "vue";
+import { defineProps, ref, computed } from "vue";
 //import { APPOINTMENT } from "../utils";
 
 
@@ -26,6 +32,11 @@ type Props = {
 }
 const props = defineProps<Props>()
 
+const form = ref<any>({
+    address: "",
+    agents: [],
+    date: Date.now()
+});
 //const appointment =
 // const fetchAgents = async () => {
 //     const resp = await SERVICE.Agent.fetch();
@@ -36,6 +47,9 @@ const props = defineProps<Props>()
 // const init = async () => {
 //     //await Promise.all([fetchAppointments(0), fetchAgents()]);
 // }
+const agents = computed<{ title: string, value: number }[]>(() => {
+    return [{ title: "Berat Alptekin", value: 12 }]
+});
 
 const title = computed<string>(() => {
     const action = props.appointment ? "Edit" : "Add";
@@ -43,16 +57,16 @@ const title = computed<string>(() => {
 });
 
 
-onMounted(() => {
-    //init();
-});
+// onMounted(() => {
+//     //init();
+// });
 </script>
 
 <style scoped>
-    .formContainer {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
+.formContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
 </style>

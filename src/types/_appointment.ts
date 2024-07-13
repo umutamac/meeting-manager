@@ -8,6 +8,7 @@ export module Appointment {
         phone: string,
         address: string,
         date: number,
-        agents: Agent.Model[]
+        agents: Agent.Model[],
+        isCanceled: boolean
     }
 }

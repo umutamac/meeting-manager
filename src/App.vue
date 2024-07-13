@@ -1,16 +1,14 @@
 <template>
-  <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
-  <MainScreen />
+  <AppointmentList />
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import MainScreen from './components/MainScreen.vue';
-
+import AppointmentList from './components/Appointment/AppointmentList.vue';
 export default defineComponent({
   name: 'App',
   components: {
-    MainScreen
+    AppointmentList
   }
 });
 </script>
