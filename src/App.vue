@@ -1,22 +1,16 @@
 <template>
+  <LoadSpinner />
   <AppointmentList />
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import AppointmentList from './components/Appointment/AppointmentList.vue';
-export default defineComponent({
-  name: 'App',
-  components: {
-    AppointmentList
-  }
-});
+<script lang="ts" setup>
 </script>
 
 <style>
 * {
   margin: 0px;
 }
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

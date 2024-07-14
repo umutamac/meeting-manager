@@ -9,20 +9,23 @@
             </div>
             <!-- dates -->
             <div>
-                <v-menu :close-on-content-click="false" location="end">
+                <DatePicker :model-value="filter.from" label="From"></DatePicker>
+                <!-- <v-menu :close-on-content-click="false" location="end">
                     <template v-slot:activator="{ props }">
                         <div v-bind="props">From: {{ formatDate(filter.from) }}</div>
                     </template>
-                    <v-date-picker></v-date-picker>
-                </v-menu>
+                <v-date-picker></v-date-picker>
+                </v-menu> -->
             </div>
             <div>
-                <v-menu :close-on-content-click="false" location="end">
+                <DatePicker :model-value="filter.to" label="To"></DatePicker>
+
+                <!-- <v-menu :close-on-content-click="false" location="end">
                     <template v-slot:activator="{ props }">
                         <div v-bind="props">To: {{ formatDate(filter.to) }}</div>
                     </template>
                     <v-date-picker v-model="filter.to"></v-date-picker>
-                </v-menu>
+                </v-menu> -->
             </div>
             <!-- search -->
             <div style="display: flex; align-items: center; margin-left: auto;">
@@ -46,119 +49,19 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from "vue";
-import type { Agent, Appointment } from "../../types";
-import { FILTER } from "../../utils";
-//import { SERVICE } from "../../service";
+import { ref, computed, onMounted } from "vue";
+import type { Agent, Appointment, Contact } from "../../types";
+import { COMMON } from "../../utils";
+import { SERVICE } from "../../service";
+import { useStore } from "vuex";
+import { State } from "@/store";
 
-const _agents = ref<Agent.Model[]>([
-    {
-        firstName: "Aysun",
-        lastName: "Alptekin",
-        color: "red"
-    },
-    {
-        firstName: "Nuri",
-        lastName: "Alptekin",
-        color: "blue"
-    },
-    {
-        firstName: "Berat",
-        lastName: "Alptekin",
-        color: "green"
-    },
-    {
-        firstName: "Ayşe",
-        lastName: "Alptekin",
-        color: "pink"
-    },
-    {
-        firstName: "Nurettin",
-        lastName: "Alptekin",
-        color: "beige"
-    }
-])
-const _contacts = ref<Agent.Model[]>([
-    {
-        firstName: "Aysun",
-        lastName: "Alptekin",
-        color: "red"
-    },
-    {
-        firstName: "Nuri",
-        lastName: "Alptekin",
-        color: "blue"
-    },
-    {
-        firstName: "Berat",
-        lastName: "Alptekin",
-        color: "green"
-    },
-    {
-        firstName: "Ayşe",
-        lastName: "Alptekin",
-        color: "pink"
-    },
-    {
-        firstName: "Nurettin",
-        lastName: "Alptekin",
-        color: "beige"
-    }
-])
-const appointments = ref<Appointment.Model[]>([
-    {
-        firstName: "Umut",
-        surName: "Alptekin",
-        email: "umut@testinvite.com",
-        phone: "90 555 444 11 22",
-        address: "55 South Western Terrace, Michigan 11111",
-        date: 1625140800000,
-        agents: [
-            {
-                firstName: "Aysun",
-                lastName: "Alptekin",
-                color: "red"
-            },
-            {
-                firstName: "Nuri",
-                lastName: "Alptekin",
-                color: "blue"
-            }
-        ],
-        isCanceled: false
-    },
-    {
-        firstName: "Amaç",
-        surName: "Alptekin",
-        email: "umut@testinvite.com",
-        phone: "90 555 999 11 11",
-        address: "123 Sunday Vista Street 12345",
-        date: 1652361115000,
-        agents: [
-            {
-                firstName: "Berat",
-                lastName: "Alptekin",
-                color: "pink"
-            },
-            {
-                firstName: "Nuri",
-                lastName: "Alptekin",
-                color: "blue"
-            },
-            {
-                firstName: "Nurettin",
-                lastName: "Alptekin",
-                color: "teal"
-            },
-            {
-                firstName: "Nurettin",
-                lastName: "Alptekin",
-                color: "beige"
-            }
-        ],
-        isCanceled: false
-    }
-]);
+const store = useStore<State>();
+
+
+const _agents = ref<Agent.Model[]>([]);
+const _contacts = ref<Contact.Model[]>([]);
+const _appointments = ref<Appointment.Model[]>([]);
 
 const now = Date.now();
 
@@ -171,8 +74,8 @@ const filter = ref<{
 }>({
     status: "",
     searchText: "",
-    from: now - 7 * 24 * 60 * 60 * 1000,
-    to: now + 7 * 24 * 60 * 60 * 1000,
+    from: now - COMMON.getMS(1, "month"),
+    to: now + COMMON.getMS(1, "month"),
     agents: []
 })
 const statusOptions: { title: string, value: "" | "completed" | "upcoming" | "canceled" }[] = [
@@ -196,33 +99,52 @@ function openAppointmentDialog(model?: any) {
 //     console.log("filter changed");
 // }
 
-// const fetchAppointments = async (offset: number) => {
-//     const _appointments = await SERVICE.Appointment.fetch(offset);
+async function fetchAppointments(offset: number) {
+    const _appointments = await SERVICE.Appointment.fetch(offset);
+    console.log("appointments", _appointments);
+    //_appointments.value = appointments;
+}
 
-//     // console.log("fetchAppointments resp", records);
-//     console.log("appointments", _appointments);
+async function fetchAgents() {
+    const resp = await SERVICE.Agent.fetch();
+    _agents.value = resp;
+}
 
-//     //_appointments.value = appointments;
-// }
+async function fetchContacts() {
+    const resp = await SERVICE.Contact.fetchAll();
+    _contacts.value = resp;
+}
 
-// const fetchAgents = async () => {
-//     const resp = await SERVICE.Agent.fetch();
-//     console.log("fetchAgents resp", resp);
-//     //agents.value = resp
-// }
+async function init() {
+    try {
+        console.log("store.state", store.state)
+        store.dispatch('SET_LOADING', true);
+        console.log("store.state", store.state)
 
-// const init = async () => {
-//     await Promise.all([fetchAppointments(0), fetchAgents()]);
-// }
+        await Promise.all([fetchAppointments(0), fetchAgents(), fetchContacts()]);
+        console.log("agents fetched", _agents.value);
+        console.log("contacts fetched", _contacts.value);
+        console.log("appointments fetched", _appointments.value);
+    } catch (err) {
+        console.error("init err", err)
+    } finally {
+        store.dispatch('SET_LOADING', false);
+        console.log("store.state", store.state)
+    }
+
+}
+
 const filteredAppointments = computed(() => {
-    const filtered = [...appointments.value].filter(a => {
-        const conditions: boolean[] = [a.date < filter.value.from, a.date > filter.value.to];
+    const filtered = [..._appointments.value].filter(a => {
+        const appointmentDateInTS = new Date(a.date).getTime();
+        const now = Date.now();
+        const conditions: boolean[] = [appointmentDateInTS < filter.value.from, appointmentDateInTS > filter.value.to];
         switch (filter.value.status) {
             case "completed":
-                conditions.push(a.date < Date.now() && !a.isCanceled)
+                conditions.push(appointmentDateInTS < now && !a.isCanceled)
                 break;
             case "upcoming":
-                conditions.push(a.date > Date.now() && !a.isCanceled)
+                conditions.push(appointmentDateInTS > now && !a.isCanceled)
                 break;
             case "canceled":
                 conditions.push(a.isCanceled)
@@ -232,21 +154,19 @@ const filteredAppointments = computed(() => {
         }
 
         if (filter.value.searchText) {
-            const searchIn = a.address + a.firstName + a.surName + a.email + a.phone;
+            const searchIn = a.address + a.contact.map(c => c.name + c.surname + c.email + String(c.phone));
             conditions.push(searchIn.includes(filter.value.searchText));
         }
-        console.log(conditions);
+        console.log(a.id, "conditions", conditions);
         return conditions.every(c => c);
     })
 
     return filtered;
 })
 
-const formatDate = FILTER.formatDate
-
-// onMounted(() => {
-//     //init();
-// })
+onMounted(() => {
+    init();
+})
 </script>
 
 <style scoped>

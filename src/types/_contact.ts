@@ -1,10 +1,10 @@
-export module Agent {
+export module Contact {
     export type Model = {
         record_id: string
-        name: string
+        name: string,
         surname: string
-        number: number
-        color: string
+        email: string
+        phone: number
         appointments: string[]
     }
 }

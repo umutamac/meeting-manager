@@ -20,6 +20,16 @@ export module COMMON {
         return diffInDays;
     }
 
+    export function getMS(amount: number, unit: "hour" | "day" | "week" |"month") {
+        const hourInMS = 60 * 60 * 1000;
+        switch (unit) {
+            case "hour": return hourInMS * amount;
+            case "day": return hourInMS * 24 * amount;
+            case "week": return hourInMS * 24 * 7 * amount;
+            case "month": return hourInMS * 30 * 24 * 7 * amount
+        }
+    }
+
     // export function recordsToArray(records: Records<FieldSet>[]): FieldSet[] {
     //     return records.map(record => ({
     //         id: record,

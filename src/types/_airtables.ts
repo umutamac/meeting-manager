@@ -2,7 +2,6 @@ export module AirTables {
 
     export module Agent {
         export type Model = {
-            record_id: string
             agent_name: string
             agent_surname: string
             appointments: string[]
@@ -13,22 +12,28 @@ export module AirTables {
 
     export module Appointment {
         export type Model = {
-            record_id: string
             appointment_id: string
-            appointment_date: string
+            appointment_date: any
             appointment_address: string
 
-            contact_id: string
+            contact_id: string[]
             contact_name: string[]
             contact_surname: string[]
+            contact_email: string[]
             contact_phone: number[]
-            is_cancelled: boolean
 
+            is_cancelled: boolean
         }
-        // export type Contact = {
-        //     name: string,
-        //     email: string,
-        //     phone: string,
-        // }
+    }
+
+    export module Contact {
+        export type Model = {
+            contact_id: string
+            contact_name: string
+            contact_surname: string
+            contact_email: string
+            contact_phone: number
+            appointments: string[]
+        }
     }
 }
