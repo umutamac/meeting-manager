@@ -4,7 +4,7 @@
             <template #activator="{ props: menuProps }">
                 <div v-bind="menuProps"> 
                     <v-text-field v-model="formattedDate" :label="props.label"
-                        prepend-icon="mdi-calendar" readonly></v-text-field>
+                        prepend-icon="mdi-calendar" readonly hide-details></v-text-field>
                 </div>
             </template>
             <v-date-picker v-model="date" @input="updateTimestamp"></v-date-picker>

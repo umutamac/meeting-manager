@@ -1,23 +1,21 @@
 <template>
     <div class="container">
-        <div class="filtersSection">
+        <div class="filters">
             <!-- agents -->
             <AgentAvatarList :agents="_agents" :l2r="false" :limit="5" />
             <!-- status -->
             <div>
-                <v-select v-model="filter.status" :items="statusOptions" label="Status"></v-select>
+                <v-select v-model="filter.status" :items="statusOptions" label="Status" hide-details></v-select>
             </div>
             <!-- dates -->
-            <div>
+            <div style="display: flex; align-items: center">
                 <DatePicker :model-value="filter.from" label="From"></DatePicker>
                 <!-- <v-menu :close-on-content-click="false" location="end">
                     <template v-slot:activator="{ props }">
                         <div v-bind="props">From: {{ formatDate(filter.from) }}</div>
                     </template>
-                <v-date-picker></v-date-picker>
-                </v-menu> -->
-            </div>
-            <div>
+<v-date-picker></v-date-picker>
+</v-menu> -->
                 <DatePicker :model-value="filter.to" label="To"></DatePicker>
 
                 <!-- <v-menu :close-on-content-click="false" location="end">
@@ -27,10 +25,11 @@
                     <v-date-picker v-model="filter.to"></v-date-picker>
                 </v-menu> -->
             </div>
+
             <!-- search -->
             <div style="display: flex; align-items: center; margin-left: auto;">
-                <v-text-field v-model="filter.searchText" label="Search" style="min-width: 150px;"></v-text-field>
-                <v-btn>ss</v-btn>
+                <v-text-field v-model="filter.searchText" label="Search" style="min-width: 150px;" hide-details></v-text-field>
+                <v-btn >ss</v-btn>
             </div>
         </div>
         <div class="listHeader">
@@ -171,12 +170,13 @@ onMounted(() => {
 
 <style scoped>
 .container {
-    background-color: beige;
+    /*background-color: beige;*/
 }
 
-.filtersSection {
+.filters {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 20px;
     margin: 0px 20px;
     padding: 20px 0px;
