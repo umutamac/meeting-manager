@@ -16,7 +16,6 @@ type Props = {
 };
 const props = withDefaults(defineProps<Props>(), { pageSize: 10 });
 
-const buttonCount = 4;
 
 /* eslint-disable no-unused-vars */
 type Emit = {
@@ -39,14 +38,23 @@ const totalPagesPossible = computed<number>(() => {
 })
 
 const buttons = computed<number[]>(() => {
-    //console.log("totalPagesPossible", totalPagesPossible.value);
-    const from = (pagination.value.current - buttonCount) > 0 ? pagination.value.current - buttonCount : 1;
-    const to = (pagination.value.current + buttonCount) < totalPagesPossible.value ? pagination.value.current + buttonCount : totalPagesPossible.value;
-    //console.log("from", from, "to", to);
+    // const maxButtonCount = 5;
 
-    const arr = Array.from({ length: to - from + 1 }, (_, index) => from + index);
-    //console.log("buttons", arr);
-    return arr;
+    const paginationArray = [];
+
+    // Logic to determine start and end indices based on currentPage
+    let start = Math.max(1, pagination.value.current - 2);
+    let end = Math.min(start + 4, totalPagesPossible.value);
+
+    // If at the end, adjust the start index
+    if (end - start < 4) {
+        start = Math.max(1, end - 4);
+    }
+    for (let i = start; i <= end; i++) {
+        paginationArray.push(i);
+    }
+    //console.log("buttons", paginationArray);
+    return paginationArray;
 })
 
 

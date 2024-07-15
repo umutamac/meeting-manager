@@ -46,8 +46,15 @@
             @paginate="paginate($event.offset)" />
     </div>
 
-    <v-dialog v-model="appointmentDialog.open" persistent>
-        <AppointmentForm :appointment="appointmentDialog.model" :contacts="contacts" :agents="agents" />
+    <v-dialog v-model="appointmentDialog.open" persistent max-width="600px">
+        <template v-if="appointmentDialog.model">
+            <AppointmentForm :appointment="appointmentDialog.model" :contacts="contacts" :agents="agents"
+                :appointments="appointments" @cancel="closeAppointmentDialog" @save="saveAppointment" />
+        </template>
+        <template v-else>
+            <AppointmentForm :contacts="contacts" :agents="agents" :appointments="appointments"
+                @cancel="closeAppointmentDialog" @save="saveAppointment" />
+        </template>
     </v-dialog>
 </template>
 
@@ -89,15 +96,25 @@ const statusOptions: { title: string, value: "" | "completed" | "upcoming" | "ca
 
 const pagination = ref<{ pageSize: number, offset: number }>({ pageSize: 10, offset: 0 });
 
-const appointmentDialog = ref<{ open: boolean, model: any }>({ open: false, model: null });
+const appointmentDialog = ref<{ open: boolean, model: Appointment.Model | null }>({ open: false, model: null });
 
 function openAppointmentDialog(model?: any) {
     if (model) appointmentDialog.value.model = model;
     appointmentDialog.value.open = true;
 }
-// function closeAppointmentDialog() {
-//     appointmentDialog.value.open = false;
-// }
+function closeAppointmentDialog() {
+    appointmentDialog.value = {
+        open: false,
+        model: null
+    }
+}
+
+async function saveAppointment(model: Appointment.Model) {
+    console.log(model)
+    // save via service
+    // close dialog
+    closeAppointmentDialog()
+}
 
 function paginate(offset: number) {
     pagination.value.offset = offset;

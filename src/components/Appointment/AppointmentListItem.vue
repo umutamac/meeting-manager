@@ -10,7 +10,7 @@
         </div>
         <div class="addressInfo">
             <v-icon>mdi-home</v-icon>
-            <div>{{ maxString(_appointment.address, 20) }}</div>
+            <div>{{ maxString(_appointment.address, 25) }}</div>
             <!-- <div>{{ _appointment.address }}</div> -->
         </div>
         <div class="dateInfo">
