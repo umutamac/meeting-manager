@@ -23,21 +23,22 @@ type Props = {
 const props = withDefaults(defineProps<Props>(), { l2r: true });
 
 const avatars = computed<{ text: string, color: string, tooltip: string }[]>(() => {
-    const shortList = props.agents.slice(0, props.limit);
-    const overAmount = props.agents.length - props.limit;
-    const avatars = shortList.map(item => {
+    if (!props.agents) return [];
+
+    let avatars = props.agents.map(item => {
         return {
             text: `${item.name[0]}${item.surname[0]}`,
             color: item.color,
             tooltip: `${item.name} ${item.surname}`
         }
     });
-    if (overAmount) {
-        const others = props.agents.slice(props.limit);
+    const overAmount = props.agents.length - props.limit;
+    if (overAmount > 0) {
+        avatars = avatars.slice(0, props.limit);
         avatars.push({
             text: `+${overAmount}`,
             color: "rgb(168, 168, 168)",
-            tooltip: others.map(o => `${o.name} ${o.surname}`).join(", ")
+            tooltip: props.agents.slice(props.limit).map(o => `${o.name} ${o.surname}`).join(", ")
         });
     }
     return avatars;

@@ -2,6 +2,7 @@ import type { App } from "vue";
 //Components
 import LoadSpinner from "./components/LoadSpinner.vue";
 import DatePicker from "./components/DatePicker.vue";
+import BottomPagination from "./components/BottomPagination.vue";
 
 import AppointmentList from "./components/Appointment/AppointmentList.vue";
 //import AgentAvatar from "./components/Agent/AgentAvatar.vue";
@@ -12,6 +13,7 @@ import AppointmentForm from "./components/Appointment/AppointmentForm.vue";
 export const registerGlobalComponents = {
     install(app: App<Element>) {
         app.
+            component("BottomPagination", BottomPagination).
             component("LoadSpinner", LoadSpinner).
             component("DatePicker", DatePicker).
             component("AppointmentList", AppointmentList).

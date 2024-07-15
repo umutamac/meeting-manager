@@ -25,4 +25,9 @@ export module FILTER {
         //console.log('Formatted DateTime:', formattedDateTime); // "01/07/2021 00:00"
         return formattedDateTime;
     }
+
+    export function truncateString(str: string, limit: number, useEllipsis = true) {
+        if (str.length <= limit) return str;
+        return str.substring(0, limit) + (useEllipsis ? '...' : '');
+    }
 }

@@ -28,20 +28,24 @@
 
             <!-- search -->
             <div style="display: flex; align-items: center; margin-left: auto;">
-                <v-text-field v-model="filter.searchText" label="Search" style="min-width: 150px;" hide-details></v-text-field>
+                <v-text-field v-model="filter.searchText" label="Search" style="min-width: 150px;"
+                    hide-details></v-text-field>
                 <!-- <v-btn >ss</v-btn> -->
             </div>
         </div>
         <div class="listHeader">
-            <div style="font-weight: 600;">{{ filteredAppointments.length }} appointments found</div>
-            <div><v-btn @click="openAppointmentDialog">Create appointment +</v-btn></div>
+            <div style="font-weight: 600;">{{ filteredAppointmentList.length }} appointments found</div>
+            <div><v-btn @click="openAppointmentDialog"> + Create appointment</v-btn></div>
         </div>
 
         <div class="list">
-            <AppointmentListItem v-for="app, i in filteredAppointments" :key="`appointment_${i}`" :appointment="app" :agents="agents"/>
+            <AppointmentListItem v-for="listItem, i in appointmentsToList" :key="`appointment_${i}`"
+                :appointment="listItem.appointment" :agents="listItem.agents" :contacts="listItem.contacts" />
         </div>
-
+        <BottomPagination :pageSize="pagination.pageSize" :totalLength="filteredAppointmentList.length"
+            @paginate="paginate($event.offset)" />
     </div>
+
     <v-dialog v-model="appointmentDialog.open" persistent>
         <AppointmentForm :appointment="appointmentDialog.model" :contacts="contacts" :agents="agents" />
     </v-dialog>
@@ -83,6 +87,8 @@ const statusOptions: { title: string, value: "" | "completed" | "upcoming" | "ca
     { title: "Canceled", value: "canceled" },
 ];
 
+const pagination = ref<{ pageSize: number, offset: number }>({ pageSize: 10, offset: 0 });
+
 const appointmentDialog = ref<{ open: boolean, model: any }>({ open: false, model: null });
 
 function openAppointmentDialog(model?: any) {
@@ -93,18 +99,19 @@ function openAppointmentDialog(model?: any) {
 //     appointmentDialog.value.open = false;
 // }
 
-// function filterChanged() {
-//     console.log("filter changed");
-// }
+function paginate(offset: number) {
+    pagination.value.offset = offset;
+    console.log("pagination", pagination.value)
+}
 
-async function fetchAppointments(offset: number) {
-    const resp = await SERVICE.Appointment.fetch(offset);
-    console.log("appointments", resp);
+async function fetchAppointments() {
+    const resp = await SERVICE.Appointment.fetchAll();
+    //console.log("appointments", resp);
     appointments.value = resp;
 }
 
 async function fetchAgents() {
-    const resp = await SERVICE.Agent.fetch();
+    const resp = await SERVICE.Agent.fetchAll();
     agents.value = resp;
 }
 
@@ -119,10 +126,10 @@ async function init() {
         store.dispatch('SET_LOADING', true);
         //console.log("store.state", store.state)
 
-        await Promise.all([fetchAppointments(0), fetchAgents(), fetchContacts()]);
-        console.log("agents fetched", agents.value);
-        console.log("contacts fetched", contacts.value);
-        console.log("appointments fetched", appointments.value);
+        await Promise.all([fetchAppointments(), fetchAgents(), fetchContacts()]);
+        // console.log("agents fetched", agents.value);
+        // console.log("contacts fetched", contacts.value);
+        // console.log("appointments fetched", appointments.value);
     } catch (err) {
         console.error("init err", err)
     } finally {
@@ -132,34 +139,53 @@ async function init() {
 
 }
 
-const filteredAppointments = computed(() => {
-    const filtered = [...appointments.value].filter(a => {
-        const appointmentDateInTS = new Date(a.date).getTime();
+const filteredAppointmentList = computed(() => {
+    const list = [...appointments.value].map(a => {
+        return {
+            appointment: a,
+            agents: agents.value.filter(agent => a.agent?.includes(String(agent.record_id))),
+            contacts: contacts.value.filter(c => a.contact?.includes(String(c.record_id)))
+        }
+    });
+    const filtered = list.filter(item => {
+        /*
+            filter by:
+            - dates DONE
+            - status DONE
+            - agents
+            - search DONE
+        */
         const now = Date.now();
+        const appointmentDateInTS = new Date(item.appointment.date).getTime();
         const conditions: boolean[] = [appointmentDateInTS > filter.value.from, appointmentDateInTS < filter.value.to];
         switch (filter.value.status) {
             case "completed":
-                conditions.push(appointmentDateInTS < now && !a.isCanceled)
+                conditions.push(appointmentDateInTS < now && !item.appointment.isCanceled)
                 break;
             case "upcoming":
-                conditions.push(appointmentDateInTS > now && !a.isCanceled)
+                conditions.push(appointmentDateInTS > now && !item.appointment.isCanceled)
                 break;
             case "canceled":
-                conditions.push(a.isCanceled)
+                conditions.push(item.appointment.isCanceled)
                 break;
             default:
                 break;
         }
 
         if (filter.value.searchText) {
-            const searchIn = a.address + a.contact.map(c => c.name + c.surname + c.email + String(c.phone));
-            conditions.push(searchIn.includes(filter.value.searchText));
+            const contactsSearchText = item.contacts.map(c => c.name + c.surname + c.email + String(c.phone)).join(" ");
+            const searchIn = (item.appointment.address + contactsSearchText).toLowerCase();
+            conditions.push(searchIn.includes(filter.value.searchText.toLowerCase()));
         }
-        console.log("id", a.id, "conditions", conditions);
+        //console.log("id", a.id, "conditions", conditions);
         return conditions.every(c => c);
     })
 
     return filtered;
+})
+
+const appointmentsToList = computed(() => {
+    return filteredAppointmentList.value.slice(pagination.value.offset, pagination.value.offset + pagination.value.pageSize);
 })
 
 onMounted(() => {
@@ -169,6 +195,7 @@ onMounted(() => {
 
 <style scoped>
 .container {
+    padding: 20px;
     /*background-color: beige;*/
 }
 
@@ -177,7 +204,6 @@ onMounted(() => {
     align-items: center;
     flex-wrap: wrap;
     gap: 20px;
-    margin: 0px 20px;
     padding: 20px 0px;
     border-bottom: 2px solid black;
 }
@@ -186,13 +212,12 @@ onMounted(() => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin: 0px 20px;
     padding: 20px 0px;
     border-bottom: 2px solid gray;
 }
 
 .list {
-    padding: 20px;
+    padding: 20px 0px;
 }
 
 .list>div {
@@ -202,6 +227,15 @@ onMounted(() => {
 }
 
 .list> :nth-child(odd) {
-    background-color: aquamarine;
+    background-color: rgb(188, 215, 231);
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: 5px;
+    padding: 20px 0px;
+
 }
 </style>

@@ -1,6 +1,5 @@
 import Airtable from 'airtable';
-import { AirTables, Agent, Contact, Appointment } from "../types";
-import { CONTACT } from '@/utils';
+import { Agent, Contact, Appointment } from "../types";
 
 const apiKey = process.env.VUE_APP_AIR_TABLES_API_TOKEN;
 const baseID = process.env.VUE_APP_AIR_TABLES_BASE_ID;
@@ -9,10 +8,11 @@ const base = new Airtable({ apiKey }).base(baseID);
 
 export module AppointmentService {
   const tableName = 'tbl9reEf5STrkSA85';// 'Appointments'
-  const pageSize = 10;
 
-  export const fetch = async (offset: number) => {
+  export const fetchBatch = async (pageNumber: number) => {
     try {
+      const pageSize = 10;
+      const offset = pageSize * (pageNumber - 1);
       const records = await base(tableName).select({ pageSize, offset }).firstPage();
       //const records = await base(tableName).select().all();
 
@@ -27,26 +27,39 @@ export module AppointmentService {
           email: string
           phone: number
         }[] = [];
-        // CONTACT.createContactsArray(
-        //   fields.contact_id as string[],
-        //   fields.contact_name as string[],
-        //   fields.contact_surname as string[],
-        //   fields.contact_email as string[],
-        //   fields.contact_phone as string[]
-        // ),
-        const agent: {
-          id: string
-          name: string
-          surname: string
-        }[] = [];
         return {
           record_id: r.id,
           id: fields.appointment_id as string,
           address: fields.appointment_address as string,
           date: fields.appointment_date as string,
           isCanceled: fields.is_cancelled as boolean,
-          contact,
-          agent
+          contact: fields.contact_id as string[],
+          agent: fields.agent_id as string[],
+        }
+      });
+      //const appointments: any[] = [];
+      return appointments;
+    } catch (error) {
+      console.error('Error fetching records from Airtable:', error);
+      throw error;
+    }
+  };
+  export const fetchAll = async () => {
+    try {
+      const records = await base(tableName).select().all();
+      //const records = await base(tableName).select().all();
+
+      console.log("Appointment records fethced:", records.length);
+      const appointments: Appointment.Model[] = records.map(r => {
+        const fields = r.fields;
+        return {
+          record_id: r.id,
+          id: fields.appointment_id as string,
+          address: fields.appointment_address as string,
+          date: fields.appointment_date as string,
+          isCanceled: fields.is_cancelled as boolean,
+          contact: fields.contact_id as string[],
+          agent: fields.agent_id as string[],
         }
       });
       //const appointments: any[] = [];
@@ -91,7 +104,7 @@ export module AppointmentService {
 export module AgentService {
   const tableName = 'tblejF2oJbI8ze105'; //'Agents'
 
-  export const fetch = async () => {
+  export const fetchAll = async () => {
     try {
       const records = await base(tableName).select().all();
       console.log("Agent records fethced:", records.length);
@@ -143,6 +156,7 @@ export module ContactService {
         const fields = r.fields;
         return {
           record_id: r.id as string,
+          id: fields.contact_id as string,
           name: fields.contact_name as string,
           surname: fields.contact_surname as string,
           email: fields.contact_email as string,
