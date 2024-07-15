@@ -69,7 +69,7 @@ export module AppointmentService {
       throw error;
     }
   };
-  /*
+
   export const createRecord = async (fields: any) => {
     try {
       const record = await base(tableName).create(fields);
@@ -79,7 +79,7 @@ export module AppointmentService {
       throw error;
     }
   };
-  
+
   export const updateRecord = async (id: string, fields: any) => {
     try {
       const record = await base(tableName).update(id, fields);
@@ -89,16 +89,7 @@ export module AppointmentService {
       throw error;
     }
   };
-  
-  export const deleteRecord = async (id: string) => {
-    try {
-      await base(tableName).destroy(id);
-    } catch (error) {
-      console.error('Error deleting record from Airtable:', error);
-      throw error;
-    }
-  };
-  */
+
 }
 
 export module AgentService {

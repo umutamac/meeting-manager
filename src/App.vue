@@ -9,6 +9,8 @@
 <style>
 * {
   margin: 0px;
+  --custom-pink: rgb(243, 109, 131);
+  --custom-gray: rgb(188, 215, 231);
 }
 
 #app {
@@ -19,7 +21,8 @@
   color: #2c3e50;
 }
 .debug {
-  background-color: gray;
-  padding: 3px;
+  background-color: lightgray;
+  padding: 5px;
+  font-size: small;
 }
 </style>

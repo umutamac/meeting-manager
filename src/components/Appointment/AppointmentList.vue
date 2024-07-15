@@ -1,14 +1,14 @@
 <template>
-    <div class="container">
+    <div class="main">
         <div class="filters">
             <!-- agents -->
-            <AgentAvatarList :agents="agents" :l2r="false" :limit="5" />
+            <AgentAvatarList class="agentFilter" :agents="agents" :l2r="false" :limit="5" />
             <!-- status -->
-            <div>
+            <div class="statusFilter">
                 <v-select v-model="filter.status" :items="statusOptions" label="Status" hide-details></v-select>
             </div>
             <!-- dates -->
-            <div style="display: flex; align-items: center">
+            <div class="dateFilter">
                 <DatePicker :ts="filter.from" label="From"></DatePicker>
                 <!-- <v-menu :close-on-content-click="false" location="end">
                     <template v-slot:activator="{ props }">
@@ -27,15 +27,16 @@
             </div>
 
             <!-- search -->
-            <div style="display: flex; align-items: center; margin-left: auto;">
-                <v-text-field v-model="filter.searchText" label="Search" style="min-width: 150px;"
+            <div class="searchFilter">
+                <v-text-field v-model="filter.searchText" label="Search" style="width: 300px;"
                     hide-details></v-text-field>
                 <!-- <v-btn >ss</v-btn> -->
             </div>
         </div>
         <div class="listHeader">
             <div style="font-weight: 600;">{{ filteredAppointmentList.length }} appointments found</div>
-            <div><v-btn @click="openAppointmentDialog"> + Create appointment</v-btn></div>
+            <div><v-btn color="hotPink" @click="openAppointmentDialog()"> + <template v-if="$vuetify.display.smAndUp">Create
+                        appointment</template></v-btn></div>
         </div>
 
         <div class="list">
@@ -43,7 +44,7 @@
                 :appointment="listItem.appointment" :agents="listItem.agents" :contacts="listItem.contacts" />
         </div>
         <BottomPagination :pageSize="pagination.pageSize" :totalLength="filteredAppointmentList.length"
-            @paginate="paginate($event.offset)" />
+            :isLast="filteredAppointmentList.length < pagination.pageSize" @paginate="paginate($event.offset)" />
     </div>
 
     <v-dialog v-model="appointmentDialog.open" persistent max-width="600px">
@@ -60,7 +61,7 @@
 
 <script lang="ts" setup>
 import { ref, computed, onMounted } from "vue";
-import type { Agent, Appointment, Contact } from "../../types";
+import type { Agent, Appointment, Contact, Vuetify } from "../../types";
 import { COMMON } from "../../utils";
 import { SERVICE } from "../../service";
 import { useStore } from "vuex";
@@ -72,10 +73,10 @@ const agents = ref<Agent.Model[]>([]);
 const contacts = ref<Contact.Model[]>([]);
 const appointments = ref<Appointment.Model[]>([]);
 
-const now = Date.now();
+type Status = "" | "completed" | "upcoming" | "canceled";
 
 const filter = ref<{
-    status: "" | "completed" | "upcoming" | "canceled",
+    status: Status,
     searchText: string,
     from: number,
     to: number,
@@ -83,11 +84,11 @@ const filter = ref<{
 }>({
     status: "",
     searchText: "",
-    from: now - COMMON.Dates.getMS(1, "year"),
-    to: now + COMMON.Dates.getMS(1, "year"),
+    from: Date.now() - COMMON.Dates.getMS(1, "year"),
+    to: Date.now() + COMMON.Dates.getMS(1, "year"),
     agents: []
 })
-const statusOptions: { title: string, value: "" | "completed" | "upcoming" | "canceled" }[] = [
+const statusOptions: Vuetify.SelectOption<Status>[] = [
     { title: "All Statuses", value: "" },
     { title: "Completed", value: "completed" },
     { title: "Upcoming", value: "upcoming" },
@@ -96,29 +97,26 @@ const statusOptions: { title: string, value: "" | "completed" | "upcoming" | "ca
 
 const pagination = ref<{ pageSize: number, offset: number }>({ pageSize: 10, offset: 0 });
 
-const appointmentDialog = ref<{ open: boolean, model: Appointment.Model | null }>({ open: false, model: null });
+const appointmentDialog = ref<{ open: boolean, model?: Appointment.Model }>({ open: false, model: undefined });
 
-function openAppointmentDialog(model?: any) {
+function paginate(offset: number) {
+    pagination.value.offset = offset;
+    //console.log("pagination", pagination.value);
+}
+
+function openAppointmentDialog(model?: Appointment.Model) {
     if (model) appointmentDialog.value.model = model;
     appointmentDialog.value.open = true;
 }
 function closeAppointmentDialog() {
-    appointmentDialog.value = {
-        open: false,
-        model: null
-    }
+    appointmentDialog.value = { open: false, model: undefined };
 }
 
 async function saveAppointment(model: Appointment.Model) {
-    console.log(model)
+    console.log("saveAppointment", model);
     // save via service
-    // close dialog
-    closeAppointmentDialog()
-}
 
-function paginate(offset: number) {
-    pagination.value.offset = offset;
-    console.log("pagination", pagination.value)
+    closeAppointmentDialog();
 }
 
 async function fetchAppointments() {
@@ -211,9 +209,8 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.container {
+.main {
     padding: 20px;
-    /*background-color: beige;*/
 }
 
 .filters {
@@ -225,9 +222,35 @@ onMounted(() => {
     border-bottom: 2px solid black;
 }
 
+.agentFilter {
+    width: 200px
+}
+
+.statusFilter {
+    width: 200px
+}
+
+.dateFilter {
+    width: 500px;
+    display: flex;
+    align-items: center;
+}
+
+.dateFilter>* {
+    
+
+}
+
+.searchFilter {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
 .listHeader {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     justify-content: space-between;
     padding: 20px 0px;
     border-bottom: 2px solid gray;
@@ -244,7 +267,7 @@ onMounted(() => {
 }
 
 .list> :nth-child(odd) {
-    background-color: rgb(188, 215, 231);
+    background-color: var(--custom-gray);
 }
 
 .pagination {

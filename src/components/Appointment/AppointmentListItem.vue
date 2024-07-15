@@ -1,26 +1,32 @@
 <template>
     <div class="listItem">
-        <div class="contactInfo">
-            <template v-if="contacts[0]">
-                <div><v-icon>mdi-face</v-icon> {{ contacts[0].name }} {{ contacts[0].surname }}</div>
-                <div><v-icon>mdi-mail</v-icon> {{ contacts[0].email }}</div>
-                <div><v-icon>mdi-call</v-icon> {{ contacts[0].phone }}</div>
-                <!-- <div class="debug">id {{ _appointment.id }}</div> -->
-            </template>
-        </div>
-        <div class="addressInfo">
-            <v-icon>mdi-home</v-icon>
-            <div>{{ maxString(_appointment.address, 25) }}</div>
-            <!-- <div>{{ _appointment.address }}</div> -->
-        </div>
-        <div class="dateInfo">
-            <div class="status">
-                <div :style="{ color: status.color }">{{ status.kind }}</div>
-                <div v-if="status.kind == 'Upcoming'">{{ status.remainingDays }} days</div>
+        <div class="info">
+            <div class="contactInfo">
+                <template v-if="contacts[0]">
+                    <div><v-icon>mdi-account</v-icon> {{ contacts[0].name }} {{ contacts[0].surname }}</div>
+                    <div><v-icon class="mr-1">mdi-mail</v-icon> {{ contacts[0].email }}</div>
+                    <div><v-icon class="mr-1">mdi-phone</v-icon> {{ contacts[0].phone }}</div>
+                    <!-- <div class="debug">id {{ _appointment.id }}</div> -->
+                </template>
+                <div v-else>No contact information</div>
             </div>
-            <div><v-icon>mdi-schedule</v-icon> {{ formatDateTime(_appointment.date) }}</div>
+            <div class="addressInfo">
+                <v-icon class="mr-1">mdi-home</v-icon>
+                <div>{{ maxString(_appointment.address, 35) }}</div>
+            </div>
+            <div class="dateAndStatusInfo">
+                <div class="statusInfo">
+                    <div :style="{ color: status.color }">{{ status.kind }}</div>
+                    <div v-if="status.kind == 'Upcoming'">{{ status.remainingDays }} days</div>
+                </div>
+                <div class="dateInfo">
+                    <v-icon class="mr-1">mdi-clock-time-five-outline</v-icon> 
+                    <span>{{ formatDateTime(_appointment.date) }}</span>
+                </div>
+            </div>
         </div>
-        <AgentAvatarList :agents="agentsForAppointments" :l2r="true" :limit="3" />
+
+        <AgentAvatarList class="agentInfo" :agents="agentsForAppointments" :l2r="true" :limit="3" />
     </div>
 </template>
 
@@ -66,13 +72,22 @@ watch(() => props.appointment,
 <style scoped>
 .listItem {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: 6fr 1fr;
+    align-items: center;
+    /* justify-items: center; */
+    gap: 10px;
+    padding: 10px 40px;
+}
+.info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     align-items: center;
     justify-items: center;
-    padding: 10px 10px;
+    gap: 10px;
+    /* padding: 10px 40px; */
 }
-
 .contactInfo {
+    justify-self: start;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -82,13 +97,17 @@ watch(() => props.appointment,
     font-weight: 700;
 }
 
+.contactInfo> :not(:first-child) {
+    font-size: smaller;
+}
+
 .addressInfo {
-    justify-self: left;
+    justify-self: stretch;
     display: flex;
     align-items: center;
 
     font-weight: 700;
-    max-width: 400px;
+    /* max-width: 400px; */
 }
 
 .addressInfo>:nth-child(2) {
@@ -97,31 +116,70 @@ watch(() => props.appointment,
     text-overflow: ellipsis;
 }
 
-.dateInfo {
+.dateAndStatusInfo {
+    justify-self: stretch;
+
     display: grid;
     align-items: center;
-    justify-content: space-between;
-    grid-template-columns: repeat(2, auto);
-    gap: 10px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
 
-    padding: 15px;
-    background-color: rgb(243, 109, 131);
+    padding: 5px 5px;
+    background-color: var(--custom-pink);
     border-radius: 15px;
     color: white
 }
 
-.dateInfo>.status {
-    width: 100%;
+.dateAndStatusInfo>.statusInfo {
+    justify-self: stretch;
+
     display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
     gap: 5px;
+
     background-color: white;
     color: black;
 
     border-radius: 10px;
-    padding: 15px;
+    padding: 10px 5px;
 }
 
-.dateInfo>.status>:first-child {
+.dateAndStatusInfo>.statusInfo>:first-child {
     font-weight: 700;
 }
+
+.dateAndStatusInfo>.dateInfo {
+    padding: 5px 15px;
+}
+
+.agentInfo {
+    justify-self: center;
+}
+
+
+/* @media (max-width: 1200px) {
+    .listItem {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+}
+
+@media (max-width: 992px) {
+    .container {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+}
+
+@media (max-width: 576px) {
+    .container {
+        grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+    }
+} */
 </style>

@@ -24,7 +24,7 @@
                     label="Status"></v-select>
             </div>
             <div class="mt-4">
-                <div>Related Appointments</div>
+                <div>Related Appointments: {{ otherAppointmentsForContact.length }}</div>
                 <AppointmentListItem v-for="a, i in otherAppointmentsForContact" :key="`app_${i}`" :agents="[]"
                     :contacts="[]"></AppointmentListItem>
             </div>
@@ -34,8 +34,8 @@
         <v-card-actions class="mt-auto">
             <div class="mt-auto"
                 style="display: flex; align-items: center; gap: 10px; justify-content: end;justify-self: end;">
-                <v-btn @click="cancel">Cancel</v-btn>
-                <v-btn color="pink" @click="save">{{ mode == "Create" ? mode : "Save" }}</v-btn>
+                <v-btn color="black" @click="cancel">Cancel</v-btn>
+                <v-btn color="hotPink" @click="save">{{ mode == "Create" ? mode : "Save" }}</v-btn>
             </div>
         </v-card-actions>
     </v-card>
@@ -43,8 +43,7 @@
 
 <script lang="ts" setup>
 import { defineProps, ref, reactive, computed, watch, defineEmits } from "vue";
-import type { Agent, Appointment, Contact } from "../../types"
-//import { APPOINTMENT } from "../utils";
+import type { Agent, Appointment, Contact, Vuetify } from "../../types"
 
 type Props = {
     appointment?: Appointment.Model | undefined;
@@ -91,7 +90,7 @@ function statusChanged(event: any) {
     console.log("statusChanged", event)
 }
 
-const statusOptions = [{
+const statusOptions: Vuetify.SelectOption<boolean>[] = [{
     title: Date.now() > form.date ? "Complted" : "Upcoming",
     value: false
 }, {
@@ -101,7 +100,7 @@ const statusOptions = [{
 
 
 
-const agentOptions = computed(() => {
+const agentOptions = computed<Vuetify.SelectOption<string>[]>(() => {
     return props.agents.map(a => {
         return {
             title: `${a.name} ${a.surname}`,
@@ -110,7 +109,7 @@ const agentOptions = computed(() => {
     })
 })
 
-const contactOptions = computed(() => {
+const contactOptions = computed<Vuetify.SelectOption<string>[]>(() => {
     return props.contacts.map(c => {
         return {
             title: `${c.name} ${c.surname}`,
