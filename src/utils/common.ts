@@ -6,6 +6,10 @@ export module COMMON {
     }
 
     export module Dates {
+        export function getISOStringFromTimestamp(timestamp: number): string {
+            const date = new Date(timestamp);
+            return date.toISOString();
+        }
         export function getDaysBetweenTimestamps(ts1: number, ts2: number): number {
             const diffInMs = Math.abs(ts1 - ts2);
             const msInDay = 24 * 60 * 60 * 1000;

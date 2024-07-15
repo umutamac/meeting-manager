@@ -17,10 +17,10 @@
             </div>
             <!-- date -->
             <div>
-                <!-- <v-date-picker v-model="form.date" label="Date date"></v-date-picker> -->
+                <v-date-picker :model-value="form.date" label="Choose Date" @date-changed="dateChanged($event)"></v-date-picker>
             </div>
             <div v-if="mode == 'edit'">
-                <v-select v-model="form.isCanceled" :items="statusOptions" @change="statusChanged"
+                <v-select v-model="form.isCancelled" :items="statusOptions" @change="statusChanged"
                     label="Status"></v-select>
             </div>
             <div class="mt-4">
@@ -68,14 +68,14 @@ const form = reactive<{
     address: string,
     contactId: string,
     agentIds: string[],
-    date: number
-    isCanceled: boolean
+    date: string
+    isCancelled: boolean
 }>({
     address: "",
     contactId: "",
     agentIds: [],
-    date: Date.now(),
-    isCanceled: false
+    date: new Date().toISOString(),
+    isCancelled: false
 });
 
 function cancel() {
@@ -90,8 +90,12 @@ function statusChanged(event: any) {
     console.log("statusChanged", event)
 }
 
+function dateChanged(date: string) {
+    form.date = date;
+}
+
 const statusOptions: Vuetify.SelectOption<boolean>[] = [{
-    title: Date.now() > form.date ? "Complted" : "Upcoming",
+    title: new Date(Date.now()) > new Date(form.date) ? "Completed" : "Upcoming",
     value: false
 }, {
     title: "Cancelled",
@@ -133,7 +137,7 @@ watch(() => props.appointment,
             form.agentIds = newValue.agent;
             //form.date = newValue.date
             form.contactId = newValue.contact ? newValue.contact[0] : ""
-            form.isCanceled = newValue.isCanceled
+            form.isCancelled = newValue.isCancelled
         }
 
     },

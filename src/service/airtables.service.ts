@@ -14,25 +14,17 @@ export module AppointmentService {
       const pageSize = 10;
       const offset = pageSize * (pageNumber - 1);
       const records = await base(tableName).select({ pageSize, offset }).firstPage();
-      //const records = await base(tableName).select().all();
 
       console.log("Appointment records fethced:", records.length);
       const appointments: Appointment.Model[] = records.map(r => {
         const fields = r.fields;
 
-        const contact: {
-          id: string
-          name: string
-          surname: string
-          email: string
-          phone: number
-        }[] = [];
         return {
           record_id: r.id,
           id: fields.appointment_id as string,
           address: fields.appointment_address as string,
           date: fields.appointment_date as string,
-          isCanceled: fields.is_cancelled as boolean,
+          isCancelled: fields.is_cancelled as boolean,
           contact: fields.contact_id as string[],
           agent: fields.agent_id as string[],
         }
@@ -57,7 +49,7 @@ export module AppointmentService {
           id: fields.appointment_id as string,
           address: fields.appointment_address as string,
           date: fields.appointment_date as string,
-          isCanceled: fields.is_cancelled as boolean,
+          isCancelled: fields.is_cancelled as boolean,
           contact: fields.contact_id as string[],
           agent: fields.agent_id as string[],
         }

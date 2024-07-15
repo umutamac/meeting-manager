@@ -3,9 +3,9 @@
         <div class="info">
             <div class="contactInfo">
                 <template v-if="contacts[0]">
-                    <div><v-icon>mdi-account</v-icon> {{ contacts[0].name }} {{ contacts[0].surname }}</div>
-                    <div><v-icon class="mr-1">mdi-mail</v-icon> {{ contacts[0].email }}</div>
-                    <div><v-icon class="mr-1">mdi-phone</v-icon> {{ contacts[0].phone }}</div>
+                    <div><v-icon>mdi-account</v-icon> <span>{{ contacts[0].name }} {{ contacts[0].surname }}</span></div>
+                    <div><v-icon class="mr-1">mdi-mail</v-icon> <span>{{ contacts[0].email }}</span></div>
+                    <div><v-icon class="mr-1">mdi-phone</v-icon> <span>{{ contacts[0].phone }}</span></div>
                     <!-- <div class="debug">id {{ _appointment.id }}</div> -->
                 </template>
                 <div v-else>No contact information</div>
@@ -44,8 +44,8 @@ const props = defineProps<Props>();
 
 const _appointment = ref<Appointment.Model>(props.appointment);
 
-const status = computed<{ kind: "Completed", color: string } | { kind: "Upcoming", color: string, remainingDays: number } | { kind: "Canceled", color: string }>(() => {
-    if (_appointment.value.isCanceled) return { kind: "Canceled", color: "red" };
+const status = computed<{ kind: "Completed", color: string } | { kind: "Upcoming", color: string, remainingDays: number } | { kind: "Cancelled", color: string }>(() => {
+    if (_appointment.value.isCancelled) return { kind: "Cancelled", color: "red" };
     const now = Date.now();
     const date = COMMON.Dates.dateStringToTS(_appointment.value.date);
     const kind = now > date ? "Completed" : "Upcoming";

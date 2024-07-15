@@ -9,33 +9,23 @@
             </div>
             <!-- dates -->
             <div class="dateFilter">
-                <DatePicker :ts="filter.from" label="From"></DatePicker>
-                <!-- <v-menu :close-on-content-click="false" location="end">
-                    <template v-slot:activator="{ props }">
-                        <div v-bind="props">From: {{ formatDate(filter.from) }}</div>
-                    </template>
-<v-date-picker></v-date-picker>
-</v-menu> -->
-                <DatePicker :ts="filter.to" label="To"></DatePicker>
-
-                <!-- <v-menu :close-on-content-click="false" location="end">
-                    <template v-slot:activator="{ props }">
-                        <div v-bind="props">To: {{ formatDate(filter.to) }}</div>
-                    </template>
-                    <v-date-picker v-model="filter.to"></v-date-picker>
-                </v-menu> -->
+                <DatePicker :model-value="filter.from" ref="fromRef" label="From"
+                    @date-changed="dateChanged('from', $event)" :disable-after="filter.to"/>
+                <DatePicker :model-value="filter.to" ref="toRef" label="To" @date-changed="dateChanged('to', $event)" :disable-before="filter.from"/>
             </div>
 
             <!-- search -->
             <div class="searchFilter">
-                <v-text-field v-model="filter.searchText" label="Search" style="width: 300px;"
-                    hide-details></v-text-field>
-                <!-- <v-btn >ss</v-btn> -->
+                <v-text-field v-model="filter.searchText" label="Search" hide-details></v-text-field>
             </div>
         </div>
         <div class="listHeader">
-            <div style="font-weight: 600;">{{ filteredAppointmentList.length }} appointments found</div>
-            <div><v-btn color="hotPink" @click="openAppointmentDialog()"> + <template v-if="$vuetify.display.smAndUp">Create
+            <div style="font-weight: 600;">{{ filteredAppointmentList.length }} appointments found 
+                <!-- <div class="debug"> from {{ filter.from }} - to {{ filter.to }}</div> -->
+            </div>
+
+            <div><v-btn color="hotPink" @click="openAppointmentDialog()"> + <template
+                        v-if="$vuetify.display.smAndUp">Create
                         appointment</template></v-btn></div>
         </div>
 
@@ -73,26 +63,26 @@ const agents = ref<Agent.Model[]>([]);
 const contacts = ref<Contact.Model[]>([]);
 const appointments = ref<Appointment.Model[]>([]);
 
-type Status = "" | "completed" | "upcoming" | "canceled";
+type Status = "" | "completed" | "upcoming" | "cancelled";
 
 const filter = ref<{
     status: Status,
     searchText: string,
-    from: number,
-    to: number,
+    from: string,
+    to: string,
     agents: any[]
 }>({
     status: "",
     searchText: "",
-    from: Date.now() - COMMON.Dates.getMS(1, "year"),
-    to: Date.now() + COMMON.Dates.getMS(1, "year"),
+    from: COMMON.Dates.getISOStringFromTimestamp(Date.now() - COMMON.Dates.getMS(1, "year")),
+    to: COMMON.Dates.getISOStringFromTimestamp(Date.now() + COMMON.Dates.getMS(1, "year")),
     agents: []
 })
 const statusOptions: Vuetify.SelectOption<Status>[] = [
     { title: "All Statuses", value: "" },
     { title: "Completed", value: "completed" },
     { title: "Upcoming", value: "upcoming" },
-    { title: "Canceled", value: "canceled" },
+    { title: "Cancelled", value: "cancelled" },
 ];
 
 const pagination = ref<{ pageSize: number, offset: number }>({ pageSize: 10, offset: 0 });
@@ -103,7 +93,11 @@ function paginate(offset: number) {
     pagination.value.offset = offset;
     //console.log("pagination", pagination.value);
 }
+function dateChanged(origin: "to" | "from", date: string) {
+    console.log("dateChanged")
+    filter.value[origin] = date;
 
+}
 function openAppointmentDialog(model?: Appointment.Model) {
     if (model) appointmentDialog.value.model = model;
     appointmentDialog.value.open = true;
@@ -155,7 +149,9 @@ async function init() {
 }
 
 const filteredAppointmentList = computed(() => {
-    const list = [...appointments.value].map(a => {
+    const list = [...appointments.value].sort((a1, a2) => {
+        return new Date(a2.date).getTime() - new Date(a1.date).getTime()
+    }).map(a => {
         return {
             appointment: a,
             agents: agents.value.filter(agent => a.agent?.includes(String(agent.record_id))),
@@ -172,16 +168,16 @@ const filteredAppointmentList = computed(() => {
         */
         const now = Date.now();
         const appointmentDateInTS = new Date(item.appointment.date).getTime();
-        const conditions: boolean[] = [appointmentDateInTS > filter.value.from, appointmentDateInTS < filter.value.to];
+        const conditions: boolean[] = [appointmentDateInTS > new Date(filter.value.from).getTime(), appointmentDateInTS < new Date(filter.value.to).getTime()];
         switch (filter.value.status) {
             case "completed":
-                conditions.push(appointmentDateInTS < now && !item.appointment.isCanceled)
+                conditions.push(appointmentDateInTS < now && !item.appointment.isCancelled)
                 break;
             case "upcoming":
-                conditions.push(appointmentDateInTS > now && !item.appointment.isCanceled)
+                conditions.push(appointmentDateInTS > now && !item.appointment.isCancelled)
                 break;
-            case "canceled":
-                conditions.push(item.appointment.isCanceled)
+            case "cancelled":
+                conditions.push(item.appointment.isCancelled)
                 break;
             default:
                 break;
@@ -236,15 +232,16 @@ onMounted(() => {
     align-items: center;
 }
 
-.dateFilter>* {
+/* .dateFilter>* {
     
 
-}
+} */
 
 .searchFilter {
     display: flex;
     align-items: center;
     margin-left: auto;
+    width: 300px;
 }
 
 .listHeader {

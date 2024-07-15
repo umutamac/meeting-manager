@@ -6,6 +6,6 @@ export module Appointment {
         date: string
         contact: string[]
         agent: string[]
-        isCanceled: boolean
+        isCancelled: boolean
     }
 }
