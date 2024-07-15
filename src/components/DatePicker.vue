@@ -15,7 +15,7 @@
 <script lang="ts" setup>
 import { defineProps, withDefaults, ref, computed, watch, defineEmits, } from "vue";
 
-type Props = { modelValue: number, label: string }
+type Props = { ts: number, label: string }
 const props = withDefaults(defineProps<Props>(), { label: "Select Date" })
 
 /* eslint-disable no-unused-vars */
@@ -47,7 +47,7 @@ function updateTimestamp() {
     emit("update:model-value", timestamp.value);
 }
 
-watch(() => props.modelValue,
+watch(() => props.ts,
     (newValue: number | null) => {
         timestamp.value = newValue ? newValue : Date.now()
     },

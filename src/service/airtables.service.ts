@@ -1,5 +1,5 @@
 import Airtable from 'airtable';
-import { AirTables, Agent, Contact } from "../types";
+import { AirTables, Agent, Contact, Appointment } from "../types";
 import { CONTACT } from '@/utils';
 
 const apiKey = process.env.VUE_APP_AIR_TABLES_API_TOKEN;
@@ -14,24 +14,39 @@ export module AppointmentService {
   export const fetch = async (offset: number) => {
     try {
       const records = await base(tableName).select({ pageSize, offset }).firstPage();
+      //const records = await base(tableName).select().all();
+
       console.log("Appointment records fethced:", records.length);
-      const appointments = records.map(r => {
+      const appointments: Appointment.Model[] = records.map(r => {
         const fields = r.fields;
+
+        const contact: {
+          id: string
+          name: string
+          surname: string
+          email: string
+          phone: number
+        }[] = [];
+        // CONTACT.createContactsArray(
+        //   fields.contact_id as string[],
+        //   fields.contact_name as string[],
+        //   fields.contact_surname as string[],
+        //   fields.contact_email as string[],
+        //   fields.contact_phone as string[]
+        // ),
+        const agent: {
+          id: string
+          name: string
+          surname: string
+        }[] = [];
         return {
           record_id: r.id,
-          id: fields.appointment_id,
-          address: fields.appointment_address,
-          date: fields.appointment_date,
-          is_cancelled: fields.is_cancelled,
-
-          contact: CONTACT.createContactsArray(
-            fields.contact_id as string[],
-            fields.contact_name as string[],
-            fields.contact_surname as string[],
-            fields.contact_email as string[],
-            fields.contact_phone as string[]
-          ),
-          agents: []
+          id: fields.appointment_id as string,
+          address: fields.appointment_address as string,
+          date: fields.appointment_date as string,
+          isCanceled: fields.is_cancelled as boolean,
+          contact,
+          agent
         }
       });
       //const appointments: any[] = [];

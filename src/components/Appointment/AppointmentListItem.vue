@@ -1,41 +1,63 @@
 <template>
     <div class="listItem">
         <div class="contactInfo">
-            <div>{{ _appointment.firstName }} {{ _appointment.surName }}</div>
-            <div>{{ _appointment.email }}</div>
-            <div>{{ _appointment.phone }}</div>
+            <template v-if="_appointment.contact[0]">
+                <div>  <v-icon>mdi-home</v-icon>
+                    {{ _appointment.contact[0].name }} {{ _appointment.contact[0].surname }}</div>
+                <div>{{ _appointment.contact[0].email }}</div>
+                <div>{{ _appointment.contact[0].phone }}</div>
+                <div class="debug">{{ _appointment.id }}</div>
+            </template>
         </div>
         <div class="addressInfo">
-            <div>{{ _appointment.address }}</div>
+            <div>  <v-icon>mdi-home</v-icon>
+                {{ _appointment.address }}</div>
         </div>
         <div class="dateInfo">
             <div class="status">
                 <div :style="{ color: status.color }">{{ status.kind }}</div>
                 <div v-if="status.kind == 'Upcoming'">{{ status.remainingDays }} days</div>
             </div>
-            <div>{{ formatDate(_appointment.date) }}</div>
+            <div>{{ isoDateToLocal(_appointment.date) }}</div>
         </div>
-        <AgentAvatarList :agents="_appointment.agents" :l2r="true" :limit="3" />
+        <AgentAvatarList :agents="agentsForAppoitnments" :l2r="true" :limit="3" />
     </div>
 </template>
 
 <script lang="ts" setup>
-import { defineProps, ref, computed, onMounted } from "vue";
-import type { Appointment } from "../../types";
+import { defineProps, ref, computed, watch, onMounted } from "vue";
+import type { Appointment, Agent } from "../../types";
 import { COMMON } from "../../utils";
 
-type Props = { appointment: Appointment.Model };
+type Props = {
+    appointment: Appointment.Model
+    agents: Agent.Model[]
+};
 const props = defineProps<Props>();
 
-const _appointment = ref<any>(props.appointment);
+const _appointment = ref<Appointment.Model>(props.appointment);
 
 const status = computed<{ kind: "Completed", color: string } | { kind: "Upcoming", color: string, remainingDays: number } | { kind: "Canceled", color: string }>(() => {
-    const kind = Date.now() > _appointment.value.date ? "Completed" : "Upcoming";
-    const remainingDays = COMMON.getDaysBetweenTimestamps(Date.now(), _appointment.value.date);
+    const now = Date.now();
+    const date = COMMON.Dates.dateStringToTS(_appointment.value.date);
+    const kind = now > date ? "Completed" : "Upcoming";
+    const remainingDays = COMMON.Dates.getDaysBetweenTimestamps(now, date);
     return kind == "Completed" ? { kind, color: "green" } : { kind, color: "orange", remainingDays };
 })
 
-const formatDate = COMMON.formatDate
+const agentsForAppoitnments = computed(() => {
+    const agents = [...props.agents].filter(a => a.appointments.map(appointmentId => appointmentId == _appointment.value.id));
+    return agents
+})
+
+const isoDateToLocal = COMMON.Dates.isoDateToLocal
+
+watch(() => props.appointment,
+    (newValue: Appointment.Model) => {
+        _appointment.value = newValue;
+    },
+    { immediate: true, deep: true }
+)
 
 onMounted(() => {
     //appointment.value = COMMON.deepCopy(props._appointment);

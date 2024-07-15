@@ -7,4 +7,9 @@ export module Agent {
         color: string
         appointments: string[]
     }
+    export type Summary = {
+        id: string
+        name: string
+        surname: string
+    }
 }

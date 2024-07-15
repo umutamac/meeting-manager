@@ -5,39 +5,33 @@ export module COMMON {
         return JSON.parse(JSON.stringify(original));
     }
 
-    export function getDaysBetweenTimestamps(ts1: number, ts2: number): number {
-        // Convert timestamps to Date objects
-        const date1 = new Date(ts1);
-        const date2 = new Date(ts2);
+    export module Dates {
+        export function getDaysBetweenTimestamps(ts1: number, ts2: number): number {
+            const diffInMs = Math.abs(ts1 - ts2);
+            const msInDay = 24 * 60 * 60 * 1000;
+            const diffInDays = Math.floor(diffInMs / msInDay);
+            return diffInDays;
+        }
 
-        // Get the difference in milliseconds
-        const diffInMs = Math.abs(date2.getTime() - date1.getTime());
+        export function getMS(amount: number, unit: "hour" | "day" | "week" | "month" |"year") {
+            const hourInMS = 60 * 60 * 1000;
+            switch (unit) {
+                case "hour": return hourInMS * amount;
+                case "day": return hourInMS * 24 * amount;
+                case "week": return hourInMS * 24 * 7 * amount;
+                case "month": return hourInMS * 24 * 30 * amount;
+                case "year": return hourInMS * 24 * 365 * amount;
+            }
+        }
 
-        // Convert milliseconds to days
-        const msInDay = 24 * 60 * 60 * 1000;
-        const diffInDays = Math.floor(diffInMs / msInDay);
+        export function dateStringToTS(str: string) {
+            const date = new Date(str);
+            return date.getTime();
+        }
 
-        return diffInDays;
-    }
-
-    export function getMS(amount: number, unit: "hour" | "day" | "week" |"month") {
-        const hourInMS = 60 * 60 * 1000;
-        switch (unit) {
-            case "hour": return hourInMS * amount;
-            case "day": return hourInMS * 24 * amount;
-            case "week": return hourInMS * 24 * 7 * amount;
-            case "month": return hourInMS * 30 * 24 * 7 * amount
+        export function isoDateToLocal(str: string) {
+            return new Date(str).toLocaleDateString();
         }
     }
-
-    // export function recordsToArray(records: Records<FieldSet>[]): FieldSet[] {
-    //     return records.map(record => ({
-    //         id: record,
-    //         fields: {
-    //             ...record.fields, // Spread operator to copy fields
-    //         },
-    //     }));
-    // }
-
 
 }

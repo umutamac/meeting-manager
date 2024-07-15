@@ -1,3 +1,5 @@
+import { Agent } from "./_agent"
+
 export module Appointment {
     export type Model = {
         record_id: string
@@ -11,11 +13,7 @@ export module Appointment {
             email: string
             phone: number
         }[]
-        agent: {
-            id: string
-            name: string
-            surname: string
-        }[]
+        agent: Agent.Summary[]
         isCanceled: boolean
     }
 }
