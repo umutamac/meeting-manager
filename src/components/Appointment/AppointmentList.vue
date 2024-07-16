@@ -244,9 +244,9 @@ onMounted(() => {
     border-bottom: 2px solid black;
 }
 
-.agentFilter {
+/* .agentFilter {
     width: 200px
-}
+} */
 
 .statusFilter {
     width: 200px

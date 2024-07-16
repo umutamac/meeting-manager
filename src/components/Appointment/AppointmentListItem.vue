@@ -18,7 +18,7 @@
             <AppointmentStatus :appointment="_appointment" />
         </div>
 
-        <AgentAvatarList class="agentInfo" :agents="agentsForAppointment" :l2r="true" :limit="3" />
+        <AgentAvatarList class="agentInfo" :agents="agentsForAppointment" :l2r="true" :limit="$vuetify.display.smAndUp ? 3 : 1" />
     </div>
 </template>
 
