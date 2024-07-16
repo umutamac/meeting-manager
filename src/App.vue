@@ -10,7 +10,7 @@
 * {
   margin: 0px;
   --custom-pink: rgb(243, 109, 131);
-  --custom-gray: rgb(188, 215, 231);
+  --custom-gray: rgb(197, 219, 231);
 }
 
 #app {

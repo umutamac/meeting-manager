@@ -10,7 +10,7 @@
             <!-- dates -->
             <div class="dateFilter">
                 <DatePicker :model-value="filter.from" ref="fromRef" label="From"
-                    @date-changed="dateChanged('from', $event)" :disable-after="filter.to"/>
+                    @date-changed="dateChanged('from', $event)" :disable-after="filter.to" class="mr-2"/>
                 <DatePicker :model-value="filter.to" ref="toRef" label="To" @date-changed="dateChanged('to', $event)" :disable-before="filter.from"/>
             </div>
 
@@ -40,11 +40,11 @@
     <v-dialog v-model="appointmentDialog.open" persistent max-width="600px">
         <template v-if="appointmentDialog.model">
             <AppointmentForm :appointment="appointmentDialog.model" :contacts="contacts" :agents="agents"
-                :appointments="appointments" @cancel="closeAppointmentDialog" @save="saveAppointment" />
+                :appointments="appointments" @cancel="closeAppointmentDialog" @update:model-value="saveAppointment" />
         </template>
         <template v-else>
             <AppointmentForm :contacts="contacts" :agents="agents" :appointments="appointments"
-                @cancel="closeAppointmentDialog" @save="saveAppointment" />
+                @cancel="closeAppointmentDialog" @update:model-value="saveAppointment" />
         </template>
     </v-dialog>
 </template>
@@ -107,7 +107,7 @@ function closeAppointmentDialog() {
 }
 
 async function saveAppointment(model: Appointment.Model) {
-    console.log("saveAppointment", model);
+    console.log("saveAppointment model", model);
     // save via service
 
     closeAppointmentDialog();
@@ -149,9 +149,7 @@ async function init() {
 }
 
 const filteredAppointmentList = computed(() => {
-    const list = [...appointments.value].sort((a1, a2) => {
-        return new Date(a2.date).getTime() - new Date(a1.date).getTime()
-    }).map(a => {
+    const list = [...appointments.value].map(a => {
         return {
             appointment: a,
             agents: agents.value.filter(agent => a.agent?.includes(String(agent.record_id))),
@@ -255,12 +253,6 @@ onMounted(() => {
 
 .list {
     padding: 20px 0px;
-}
-
-.list>div {
-    border: 1px black solid;
-    border-radius: 5px;
-    margin-bottom: 5px;
 }
 
 .list> :nth-child(odd) {

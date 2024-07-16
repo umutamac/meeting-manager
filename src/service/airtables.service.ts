@@ -9,33 +9,33 @@ const base = new Airtable({ apiKey }).base(baseID);
 export module AppointmentService {
   const tableName = 'tbl9reEf5STrkSA85';// 'Appointments'
 
-  export const fetchBatch = async (pageNumber: number) => {
-    try {
-      const pageSize = 10;
-      const offset = pageSize * (pageNumber - 1);
-      const records = await base(tableName).select({ pageSize, offset }).firstPage();
+  // export const fetchBatch = async (pageNumber: number) => {
+  //   try {
+  //     const pageSize = 10;
+  //     const offset = pageSize * (pageNumber - 1);
+  //     const records = await base(tableName).select({ pageSize, offset }).firstPage();
 
-      console.log("Appointment records fethced:", records.length);
-      const appointments: Appointment.Model[] = records.map(r => {
-        const fields = r.fields;
+  //     console.log("Appointment records fethced:", records.length);
+  //     const appointments: Appointment.Model[] = records.map(r => {
+  //       const fields = r.fields;
 
-        return {
-          record_id: r.id,
-          id: fields.appointment_id as string,
-          address: fields.appointment_address as string,
-          date: fields.appointment_date as string,
-          isCancelled: fields.is_cancelled as boolean,
-          contact: fields.contact_id as string[],
-          agent: fields.agent_id as string[],
-        }
-      });
-      //const appointments: any[] = [];
-      return appointments;
-    } catch (error) {
-      console.error('Error fetching records from Airtable:', error);
-      throw error;
-    }
-  };
+  //       return {
+  //         record_id: r.id,
+  //         id: fields.appointment_id as string,
+  //         address: fields.appointment_address as string,
+  //         date: fields.appointment_date as string,
+  //         isCancelled: fields.is_cancelled as boolean,
+  //         contact: fields.contact_id as string[],
+  //         agent: fields.agent_id as string[],
+  //       }
+  //     });
+  //     //const appointments: any[] = [];
+  //     return appointments;
+  //   } catch (error) {
+  //     console.error('Error fetching records from Airtable:', error);
+  //     throw error;
+  //   }
+  // };
   export const fetchAll = async () => {
     try {
       const records = await base(tableName).select().all();
@@ -55,7 +55,7 @@ export module AppointmentService {
         }
       });
       //const appointments: any[] = [];
-      return appointments;
+      return appointments.sort((a1, a2) => new Date(a2.date).getTime() - new Date(a1.date).getTime());
     } catch (error) {
       console.error('Error fetching records from Airtable:', error);
       throw error;

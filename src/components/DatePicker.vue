@@ -5,8 +5,8 @@
                 min-width="290px">
                 <template #activator="{ props: menuProps }">
                     <div v-bind="menuProps">
-                        <v-text-field v-model="localDateString" :label="props.label" prepend-icon="mdi-calendar"
-                            readonly hide-details></v-text-field>
+                        <v-text-field v-model="localDateString" :label="props.label" prepend-inner-icon="mdi-calendar"
+                            readonly hide-details bg-color="white"></v-text-field>
                     </div>
                 </template>
                 <v-date-picker v-model="date" @update:model-value="updateTimestamp"

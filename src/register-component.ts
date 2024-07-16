@@ -9,6 +9,7 @@ import AppointmentList from "./components/Appointment/AppointmentList.vue";
 import AgentAvatarList from "./components/Agent/AgentAvatarList.vue";
 import AppointmentListItem from "./components/Appointment/AppointmentListItem.vue";
 import AppointmentForm from "./components/Appointment/AppointmentForm.vue";
+import AppointmentStatus from "./components/Appointment/AppointmentStatus.vue";
 
 export const registerGlobalComponents = {
     install(app: App<Element>) {
@@ -19,6 +20,7 @@ export const registerGlobalComponents = {
             component("AppointmentList", AppointmentList).
             component("AgentAvatarList", AgentAvatarList).
             component("AppointmentListItem", AppointmentListItem).
-            component("AppointmentForm", AppointmentForm)
+            component("AppointmentForm", AppointmentForm).
+            component("AppointmentStatus", AppointmentStatus)
     }
 };

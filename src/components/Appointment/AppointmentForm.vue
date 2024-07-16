@@ -1,49 +1,60 @@
 <template>
-    <v-card style="height: 800px;">
-        <v-card-title style="text-align: center;">{{ mode }} an Appointment</v-card-title>
+    <v-card class="formContainer" style="height: 800px;">
+        <v-card-title style="text-align: center; font-weight: 600;">
+            <v-icon>mdi-calendar-blank</v-icon> {{ mode }} an Appointment
+        </v-card-title>
         <v-card-item>
-            <!-- search -->
+            <v-form ref="formRef" class="appointmentForm mb-7" v-model="form.valid" lazy-validation @submit.prevent>
+                <!-- contact search -->
+                <div>
+                    <v-autocomplete v-model="form.data.contactId" :items="contactOptions" :rules="rules.required"
+                        label="Choose contact" bg-color="white"></v-autocomplete>
+                </div>
+                <!-- address -->
+                <div>
+                    <v-text-field v-model="form.data.address" :rules="rules.required" label="Address" clearable
+                        bg-color="white"></v-text-field>
+                </div>
+                <!-- agent -->
+                <div>
+                    <v-select v-model="form.data.agentIds" :items="agentOptions" multiple :rules="rules.required"
+                        label="Choose Agent(s)" bg-color="white"></v-select>
+                </div>
+                <!-- date -->
+                <div>
+                    <DatePicker :modelValue="form.data.date" label="Choose Date" @date-changed="dateChanged($event)" />
+                </div>
+                <div v-if="mode == 'edit'">
+                    <v-select v-model="form.data.isCancelled" :items="statusOptions" @change="statusChanged"
+                        label="Status" bg-color="white"></v-select>
+                </div>
+            </v-form>
+            <!-- <div class="debug my-4">
+                <div>props.appointment {{ JSON.stringify(appointment) }}</div>
+                <div>form {{ form }}</div>
+            </div> -->
             <div>
-                <v-autocomplete v-model="form.contactId" :items="contactOptions"
-                    label="Choose contact"></v-autocomplete>
+                <div style="font-weight: 600;">Related Appointments: {{ otherAppointmentsForContact.length }}</div>
+                <div class="appointmentList">
+                    <AppointmentListItem v-for="app, i in otherAppointmentsForContact" :key="`app_${i}`"
+                        :appointment="app" :agents="agents" :contacts="[]" :showContactInfo="false">
+                    </AppointmentListItem>
+                </div>
             </div>
-            <!-- address -->
-            <div>
-                <v-text-field v-model="form.address" label="Address" clearable></v-text-field>
-            </div>
-            <!-- agent -->
-            <div>
-                <v-select v-model="form.agentIds" :items="agentOptions" multiple label="Choose Agent(s)"></v-select>
-            </div>
-            <!-- date -->
-            <div>
-                <v-date-picker :model-value="form.date" label="Choose Date" @date-changed="dateChanged($event)"></v-date-picker>
-            </div>
-            <div v-if="mode == 'edit'">
-                <v-select v-model="form.isCancelled" :items="statusOptions" @change="statusChanged"
-                    label="Status"></v-select>
-            </div>
-            <div class="mt-4">
-                <div>Related Appointments: {{ otherAppointmentsForContact.length }}</div>
-                <AppointmentListItem v-for="a, i in otherAppointmentsForContact" :key="`app_${i}`" :agents="[]"
-                    :contacts="[]"></AppointmentListItem>
-            </div>
-            <div class="debug">props.appointment {{ JSON.stringify(appointment) }}</div>
-            <div class="debug">form {{ form }}</div>
+
         </v-card-item>
         <v-card-actions class="mt-auto">
-            <div class="mt-auto"
-                style="display: flex; align-items: center; gap: 10px; justify-content: end;justify-self: end;">
-                <v-btn color="black" @click="cancel">Cancel</v-btn>
-                <v-btn color="hotPink" @click="save">{{ mode == "Create" ? mode : "Save" }}</v-btn>
-            </div>
+            <v-btn color="black" @click="cancel">Cancel</v-btn>
+            <v-btn color="hotPink" @click="save">{{ mode == "Create" ? mode : "Save" }}</v-btn>
         </v-card-actions>
     </v-card>
 </template>
 
 <script lang="ts" setup>
 import { defineProps, ref, reactive, computed, watch, defineEmits } from "vue";
-import type { Agent, Appointment, Contact, Vuetify } from "../../types"
+import type { Agent, Appointment, Contact, Vuetify, Validation } from "../../types";
+import { VALIDATOR } from "../../utils";
+import type { VForm } from "vuetify/components";
 
 type Props = {
     appointment?: Appointment.Model | undefined;
@@ -61,29 +72,59 @@ type Emit = {
 const emit = defineEmits<Emit>();
 /* eslint-enable no-unused-vars */
 
+const rules: Validation.Rules = {
+    required: [VALIDATOR.required]
+}
 
 const mode = ref<"Create" | "Edit">("Create");
 
-const form = reactive<{
-    address: string,
-    contactId: string,
-    agentIds: string[],
-    date: string
-    isCancelled: boolean
-}>({
-    address: "",
-    contactId: "",
-    agentIds: [],
-    date: new Date().toISOString(),
-    isCancelled: false
+const formRef = ref<VForm | null>(null);
+
+type Form = {
+    valid: boolean | null,
+    data: {
+        address: string,
+        contactId: string,
+        agentIds: string[],
+        date: string
+        isCancelled: boolean
+    }
+}
+const form = reactive<Form>({
+    valid: null,
+    data: {
+        address: "",
+        contactId: "",
+        agentIds: [],
+        date: new Date().toISOString(),
+        isCancelled: false
+    }
 });
 
 function cancel() {
     emit("cancel");
 }
-function save() {
-    console.log("save");
-    emit("cancel");
+async function isFormValid(): Promise<boolean> {
+    if (!formRef.value) return false;
+    const validation = await formRef.value.validate();
+    return validation.valid;
+}
+async function save() {
+    if (!await isFormValid()) {
+        console.log("form not valid");
+        return;
+    }
+
+    const newAppointment: Appointment.Model = {
+        address: form.data.address,
+        contact: [form.data.contactId],
+        agent: form.data.agentIds,
+        date: form.data.date,
+        isCancelled: form.data.isCancelled,
+        id: "",
+        record_id: ""
+    }
+    emit("update:model-value", newAppointment);
 }
 
 function statusChanged(event: any) {
@@ -91,11 +132,11 @@ function statusChanged(event: any) {
 }
 
 function dateChanged(date: string) {
-    form.date = date;
+    form.data.date = date;
 }
 
 const statusOptions: Vuetify.SelectOption<boolean>[] = [{
-    title: new Date(Date.now()) > new Date(form.date) ? "Completed" : "Upcoming",
+    title: new Date(Date.now()) > new Date(form.data.date) ? "Completed" : "Upcoming",
     value: false
 }, {
     title: "Cancelled",
@@ -122,28 +163,44 @@ const contactOptions = computed<Vuetify.SelectOption<string>[]>(() => {
     })
 })
 
-const otherAppointmentsForContact = computed(() => {
-    const currectContact = props.contacts.find(c => c.id == form.contactId);
-    if (!currectContact || !props.appointment) return [];
-    return props.appointments.filter(a => a.contact.includes(form.contactId))
+const otherAppointmentsForContact = computed<Appointment.Model[]>(() => {
+    const currectContact = props.contacts.find(c => c.record_id == form.data.contactId);
+    if (!currectContact) {
+        console.log("no currect contact")
+        return [];
+    }
+    //console.log("currentContact record id", currectContact.record_id, "id", currectContact.id)
+    return props.appointments.filter(a => a.contact.includes(form.data.contactId));
 })
 
 watch(() => props.appointment,
     (newValue: Appointment.Model | undefined) => {
-        console.log("watch: newValue", newValue);
+        //console.log("watch: newValue", newValue);
         if (newValue) {
             mode.value = "Edit";
-            form.address = newValue.address;
-            form.agentIds = newValue.agent;
+            form.data.address = newValue.address;
+            form.data.agentIds = newValue.agent;
             //form.date = newValue.date
-            form.contactId = newValue.contact ? newValue.contact[0] : ""
-            form.isCancelled = newValue.isCancelled
+            form.data.contactId = newValue.contact ? newValue.contact[0] : ""
+            form.data.isCancelled = newValue.isCancelled
         }
 
     },
     { immediate: true, deep: true }
 )
-
 </script>
 
-<style scoped></style>
+<style scoped>
+.formContainer {
+    background-color: var(--custom-gray);
+}
+
+.appointmentForm>* {
+    margin-bottom: 10px
+}
+
+.appointmentList>* {
+    background-color: white;
+    margin-bottom: 10px;
+}
+</style>

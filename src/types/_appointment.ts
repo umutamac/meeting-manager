@@ -8,4 +8,6 @@ export module Appointment {
         agent: string[]
         isCancelled: boolean
     }
+
+    export type Status = { kind: "Completed", color: string } | { kind: "Upcoming", color: string, remainingDays: number } | { kind: "Cancelled", color: string }
 }
