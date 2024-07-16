@@ -1,7 +1,12 @@
 <template>
-    <v-overlay v-if="isLoading" color="rgba(255, 255, 255, 0.8)">
-        <v-progress-circular indeterminate size="64"></v-progress-circular>
-    </v-overlay>
+    <v-dialog v-model="isLoading" persistent width="auto">
+        <v-card color="white">
+            <v-card-text>
+                <v-progress-circular indeterminate color="primary" :size="128" :width="16"></v-progress-circular>
+            </v-card-text>
+            <v-card-title style="text-align: center;">Loading...</v-card-title>
+        </v-card>
+    </v-dialog>
 </template>
 
 <script lang="ts" setup>
