@@ -1,8 +1,8 @@
 <template>
     <div class="avatarList">
         <v-tooltip v-for="item, i in avatars" :key="`agent_${i}`" location="top">
-            <template v-slot:activator="{ props }">
-                <v-avatar v-bind="props" :color="item.color"
+            <template v-slot:activator="{ props: tooltipProps }">
+                <v-avatar v-bind="tooltipProps" :color="item.color"
                     :style="{ 'z-index': l2r ? 100 - i : 100 + i, 'margin-right': -5 + 'px' }">{{ item.text
                     }}</v-avatar>
             </template>

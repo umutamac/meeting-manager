@@ -2,7 +2,8 @@
     <div class="main">
         <div class="filters">
             <!-- agents -->
-            <AgentAvatarList class="agentFilter" :agents="agents" :l2r="false" :limit="5" />
+            <SelectAgents class="agentFilter" :agents="agents" :modelValue="filter.agents"
+                @update:model-value="filter.agents = $event" />
             <!-- status -->
             <div class="statusFilter">
                 <v-select v-model="filter.status" :items="statusOptions" label="Status" hide-details></v-select>
@@ -71,7 +72,7 @@ const filter = ref<{
     searchText: string,
     from: string,
     to: string,
-    agents: any[]
+    agents: string[]
 }>({
     status: "",
     searchText: "",
@@ -200,6 +201,11 @@ const filteredAppointmentList = computed(() => {
                 break;
             default:
                 break;
+        }
+
+        if (filter.value.agents.length > 0) {
+            if (typeof item.appointment.agent !== "object") console.log("agent", item.appointment.agent)
+            conditions.push(item.appointment.agent ? filter.value.agents.every(agent => item.appointment.agent.includes(agent)) : false);
         }
 
         if (filter.value.searchText) {

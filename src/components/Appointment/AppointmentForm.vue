@@ -120,8 +120,8 @@ async function save() {
         agent: form.data.agentIds,
         date: form.data.date,
         isCancelled: form.data.isCancelled,
-        id: "",
-        record_id: ""
+        id: props.appointment ? props.appointment.id : "",
+        record_id: props.appointment ? props.appointment.record_id : "",
     }
     emit("update:model-value", newAppointment);
 }
@@ -181,8 +181,8 @@ watch(() => props.appointment,
             form.data.address = newValue.address;
             form.data.agentIds = newValue.agent;
             form.data.date = newValue.date;
-            form.data.contactId = newValue.contact ? newValue.contact[0] : ""
-            form.data.isCancelled = newValue.isCancelled
+            form.data.contactId = newValue.contact ? newValue.contact[0] : "";
+            form.data.isCancelled = newValue.isCancelled;
         }
 
     },

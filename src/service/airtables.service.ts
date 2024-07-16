@@ -40,10 +40,8 @@ export module AppointmentService {
   export const fetchAll = async () => {
     try {
       const records = await base(tableName).select().all();
-      //const records = await base(tableName).select().all();
-
       console.log("Appointment records fethced:", records.length);
-      const appointments = APPOINTMENT.recordsToModels(records);
+      const appointments = records.map(r => APPOINTMENT.recordsToModel(r));
       return appointments.sort((a1, a2) => new Date(a2.date).getTime() - new Date(a1.date).getTime());
     } catch (error) {
       console.error('Error fetching records from Airtable:', error);
@@ -60,19 +58,25 @@ export module AppointmentService {
           contact_id: appointment.contact,
           agent_id: appointment.agent
         }
-      }]
+      }];
       const records = await base(tableName).create(list);
-      return APPOINTMENT.recordsToModels(records);
+      return records.map(r => APPOINTMENT.recordsToModel(r));
     } catch (error) {
       console.error('Error creating record in Airtable:', error);
       throw error;
     }
   };
 
-  export const updateRecord = async (id: string, fields: any) => {
+  export const updateRecord = async (id: string, appointment: Appointment.Model) => {
     try {
+      const fields = {
+        appointment_date: appointment.date,
+        appointment_address: appointment.address,
+        contact_id: appointment.contact,
+        agent_id: appointment.agent
+      };
       const record = await base(tableName).update(id, fields);
-      return record;
+      return APPOINTMENT.recordsToModel(record);
     } catch (error) {
       console.error('Error updating record in Airtable:', error);
       throw error;
