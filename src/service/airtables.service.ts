@@ -49,7 +49,7 @@ export module AppointmentService {
     }
   };
 
-  export const createRecord = async (appointment: Appointment.Model) => {
+  export const create = async (appointment: Appointment.Model) => {
     try {
       const list = [{
         fields: {
@@ -67,16 +67,19 @@ export module AppointmentService {
     }
   };
 
-  export const updateRecord = async (id: string, appointment: Appointment.Model) => {
+  export const update = async (id: string, appointment: Appointment.Model) => {
     try {
-      const fields = {
-        appointment_date: appointment.date,
-        appointment_address: appointment.address,
-        contact_id: appointment.contact,
-        agent_id: appointment.agent
-      };
-      const record = await base(tableName).update(id, fields);
-      return APPOINTMENT.recordsToModel(record);
+      const updates = [{
+        id,
+        fields: {
+          appointment_date: appointment.date,
+          appointment_address: appointment.address,
+          contact_id: appointment.contact,
+          agent_id: appointment.agent
+        }
+      }];
+      const records = await base(tableName).update(updates);
+      return records.map(r => APPOINTMENT.recordsToModel(r));
     } catch (error) {
       console.error('Error updating record in Airtable:', error);
       throw error;
@@ -114,23 +117,23 @@ export module AgentService {
 export module ContactService {
   const tableName = 'tbl0TuknKqXHysejd'; //'Contacts'
 
-  export const fetchId = async (id: string) => {
-    try {
-      const records = await base(tableName).find(id);
-      console.log(`ContactService fetch ${id}`, records);
-      // const contacts: Contact.Model[] = records.map(r => {
-      //   const fields = r.fields;
-      //   return {
-      //     record_id: r.id,
-      //     ...r.fields
-      //   }
-      // });
-      return records;
-    } catch (error) {
-      console.error('Error fetching records from Airtable:', error);
-      throw error;
-    }
-  };
+  // export const fetchId = async (id: string) => {
+  //   try {
+  //     const records = await base(tableName).find(id);
+  //     console.log(`ContactService fetch ${id}`, records);
+  //     // const contacts: Contact.Model[] = records.map(r => {
+  //     //   const fields = r.fields;
+  //     //   return {
+  //     //     record_id: r.id,
+  //     //     ...r.fields
+  //     //   }
+  //     // });
+  //     return records;
+  //   } catch (error) {
+  //     console.error('Error fetching records from Airtable:', error);
+  //     throw error;
+  //   }
+  // };
 
   export const fetchAll = async () => {
     try {

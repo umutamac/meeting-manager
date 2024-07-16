@@ -1,6 +1,6 @@
 <template>
     <v-card class="formContainer">
-        <v-card-title>
+        <v-card-title class="formTitle">
             <v-icon>mdi-calendar-blank</v-icon> {{ mode }} an Appointment
         </v-card-title>
         <v-card-item>
@@ -193,10 +193,9 @@ watch(() => props.appointment,
 <style scoped>
 .formContainer {
     background-color: var(--custom-gray);
-    height: 800px;
 }
 
-.formContainer>:first-child {
+.formTitle {
     text-align: center;
     font-weight: 600;
 }

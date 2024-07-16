@@ -72,6 +72,7 @@ watch(() => props.modelValue,
 
 <style scoped>
 .container {
+    cursor: pointer;
     min-width: 200px;
 }
 </style>

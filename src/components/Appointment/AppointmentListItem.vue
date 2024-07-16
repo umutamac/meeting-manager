@@ -5,7 +5,7 @@
                 <template v-if="contacts[0]">
                     <div><v-icon>mdi-account</v-icon> <span>{{ contacts[0].name }} {{ contacts[0].surname }}</span>
                     </div>
-                    <div><v-icon class="mr-1">mdi-mail</v-icon> <span>{{ contacts[0].email }}</span></div>
+                    <div><v-icon class="mr-1">mdi-email</v-icon> <span>{{ contacts[0].email }}</span></div>
                     <div><v-icon class="mr-1">mdi-phone</v-icon> <span>{{ contacts[0].phone }}</span></div>
                     <!-- <div class="debug">id {{ _appointment.id }}</div> -->
                 </template>
@@ -58,14 +58,18 @@ watch(() => props.appointment,
     display: grid;
     grid-template-columns: 6fr 1fr;
     align-items: center;
-    /* justify-items: center; */
     gap: 10px;
     padding: 10px 40px;
-
-
+    margin-bottom: 5px;
     border: 1px black solid;
     border-radius: 5px;
-    margin-bottom: 5px;
+
+    cursor: pointer;
+    
+}
+.listItem:hover {
+    background-color: #add8e6; /* Slightly darker shade of lightblue */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow on hover */
 }
 
 .info {

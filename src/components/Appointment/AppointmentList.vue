@@ -33,13 +33,14 @@
 
         <div class="list">
             <AppointmentListItem v-for="listItem, i in appointmentsToList" :key="`appointment_${i}`"
-                :appointment="listItem.appointment" :agents="listItem.agents" :contacts="listItem.contacts" />
+                :appointment="listItem.appointment" :agents="listItem.agents" :contacts="listItem.contacts"
+                @click="openAppointmentDialog(listItem.appointment)" />
         </div>
         <BottomPagination :pageSize="pagination.pageSize" :totalLength="filteredAppointmentList.length"
             :isLast="filteredAppointmentList.length < pagination.pageSize" @paginate="paginate($event.offset)" />
     </div>
 
-    <v-dialog v-model="appointmentDialog.open" persistent max-width="600px">
+    <v-dialog v-model="appointmentDialog.open" persistent max-width="600px" height="900px">
         <template v-if="appointmentDialog.model">
             <AppointmentForm :appointment="appointmentDialog.model" :contacts="contacts" :agents="agents"
                 :appointments="appointments" @cancel="closeAppointmentDialog" @update:model-value="saveAppointment" />
@@ -116,11 +117,11 @@ async function saveAppointment(model: Appointment.Model) {
         store.dispatch('SET_LOADING', true);
 
         if (appointmentDialog.value.model) {
-            console.log("updating appt", appointmentDialog.value.model.record_id);
-            //await SERVICE.Appointment.updateRecord(model);
+            //console.log("updating appt", appointmentDialog.value.model.record_id);
+            await SERVICE.Appointment.update(appointmentDialog.value.model.record_id, model);
         } else {
             console.log("creating appt");
-            await SERVICE.Appointment.createRecord(model);
+            await SERVICE.Appointment.create(model);
         }
 
         await fetchAppointments(); // temp fix

@@ -1,7 +1,7 @@
 <template>
     <v-menu location="bottom" :close-on-content-click="false">
         <template v-slot:activator="{ props }">
-            <AgentAvatarList v-bind="props" :agents="agents" :l2r="false" :limit="5" />
+            <AgentAvatarList v-bind="props" :agents="agents" :l2r="false" :limit="5" style="cursor: pointer;" />
         </template>
         <v-card>
             <v-list>
