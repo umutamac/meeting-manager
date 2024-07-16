@@ -51,7 +51,7 @@ const localDateString = computed<string>(() => {
 
 function updateTimestamp() {
     ISOdateString.value = new Date(date.value).toISOString();
-    console.log("dateString", ISOdateString.value);
+    //console.log("dateString", ISOdateString.value);
     emit("date-changed", ISOdateString.value);
 }
 

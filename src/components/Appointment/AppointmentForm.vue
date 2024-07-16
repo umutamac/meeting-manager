@@ -180,7 +180,7 @@ watch(() => props.appointment,
             mode.value = "Edit";
             form.data.address = newValue.address;
             form.data.agentIds = newValue.agent;
-            //form.date = newValue.date
+            form.data.date = newValue.date;
             form.data.contactId = newValue.contact ? newValue.contact[0] : ""
             form.data.isCancelled = newValue.isCancelled
         }

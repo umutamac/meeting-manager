@@ -1,5 +1,6 @@
 import Airtable from 'airtable';
 import { Agent, Contact, Appointment } from "../types";
+import { APPOINTMENT } from '@/utils';
 
 const apiKey = process.env.VUE_APP_AIR_TABLES_API_TOKEN;
 const baseID = process.env.VUE_APP_AIR_TABLES_BASE_ID;
@@ -42,19 +43,7 @@ export module AppointmentService {
       //const records = await base(tableName).select().all();
 
       console.log("Appointment records fethced:", records.length);
-      const appointments: Appointment.Model[] = records.map(r => {
-        const fields = r.fields;
-        return {
-          record_id: r.id,
-          id: fields.appointment_id as string,
-          address: fields.appointment_address as string,
-          date: fields.appointment_date as string,
-          isCancelled: fields.is_cancelled as boolean,
-          contact: fields.contact_id as string[],
-          agent: fields.agent_id as string[],
-        }
-      });
-      //const appointments: any[] = [];
+      const appointments = APPOINTMENT.recordsToModels(records);
       return appointments.sort((a1, a2) => new Date(a2.date).getTime() - new Date(a1.date).getTime());
     } catch (error) {
       console.error('Error fetching records from Airtable:', error);
@@ -62,10 +51,18 @@ export module AppointmentService {
     }
   };
 
-  export const createRecord = async (fields: any) => {
+  export const createRecord = async (appointment: Appointment.Model) => {
     try {
-      const record = await base(tableName).create(fields);
-      return record;
+      const list = [{
+        fields: {
+          appointment_date: appointment.date,
+          appointment_address: appointment.address,
+          contact_id: appointment.contact,
+          agent_id: appointment.agent
+        }
+      }]
+      const records = await base(tableName).create(list);
+      return APPOINTMENT.recordsToModels(records);
     } catch (error) {
       console.error('Error creating record in Airtable:', error);
       throw error;

@@ -10,8 +10,9 @@
             <!-- dates -->
             <div class="dateFilter">
                 <DatePicker :model-value="filter.from" ref="fromRef" label="From"
-                    @date-changed="dateChanged('from', $event)" :disable-after="filter.to" class="mr-2"/>
-                <DatePicker :model-value="filter.to" ref="toRef" label="To" @date-changed="dateChanged('to', $event)" :disable-before="filter.from"/>
+                    @date-changed="dateChanged('from', $event)" :disable-after="filter.to" class="mr-2" />
+                <DatePicker :model-value="filter.to" ref="toRef" label="To" @date-changed="dateChanged('to', $event)"
+                    :disable-before="filter.from" />
             </div>
 
             <!-- search -->
@@ -20,7 +21,7 @@
             </div>
         </div>
         <div class="listHeader">
-            <div style="font-weight: 600;">{{ filteredAppointmentList.length }} appointments found 
+            <div style="font-weight: 600;">{{ filteredAppointmentList.length }} appointments found
                 <!-- <div class="debug"> from {{ filter.from }} - to {{ filter.to }}</div> -->
             </div>
 
@@ -107,10 +108,30 @@ function closeAppointmentDialog() {
 }
 
 async function saveAppointment(model: Appointment.Model) {
-    console.log("saveAppointment model", model);
-    // save via service
+    try {
+        console.log("saveAppointment model", model);
+        if (!appointmentDialog.value.open) return;
 
-    closeAppointmentDialog();
+        store.dispatch('SET_LOADING', true);
+
+        if (appointmentDialog.value.model) {
+            console.log("updating appt", appointmentDialog.value.model.record_id);
+            //await SERVICE.Appointment.updateRecord(model);
+        } else {
+            console.log("creating appt");
+            await SERVICE.Appointment.createRecord(model);
+        }
+
+        await fetchAppointments(); // temp fix
+        // TODO: insert new appt to appointments.value manually
+
+        closeAppointmentDialog();
+    } catch (err) {
+        console.error(err)
+    } finally {
+        store.dispatch('SET_LOADING', false);
+    }
+
 }
 
 async function fetchAppointments() {
