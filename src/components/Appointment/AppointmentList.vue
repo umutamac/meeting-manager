@@ -248,20 +248,21 @@ onMounted(() => {
     width: 200px
 } */
 
-.statusFilter {
+/* .statusFilter {
     width: 200px
-}
+} */
 
 .dateFilter {
-    width: 500px;
+    /* width: 500px; */
     display: flex;
     align-items: center;
 }
 
-/* .dateFilter>* {
-    
+.dateFilter>* {
+    width: 200px;
+}
 
-} */
+
 
 .searchFilter {
     display: flex;
@@ -294,5 +295,19 @@ onMounted(() => {
     gap: 5px;
     padding: 20px 0px;
 
+}
+
+@media screen and (max-width: 600px) {
+    .dateFilter {
+        display: block;
+    }
+
+    .dateFilter>* {
+        width: 100%;
+    }
+
+    .searchFilter {
+        width: 100%;
+    }
 }
 </style>

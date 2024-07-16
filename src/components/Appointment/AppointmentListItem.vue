@@ -18,7 +18,8 @@
             <AppointmentStatus :appointment="_appointment" />
         </div>
 
-        <AgentAvatarList class="agentInfo" :agents="agentsForAppointment" :l2r="true" :limit="$vuetify.display.smAndUp ? 3 : 1" />
+        <AgentAvatarList class="agentInfo" :agents="agentsForAppointment" :l2r="true"
+            :limit="$vuetify.display.smAndUp ? 3 : 1" />
     </div>
 </template>
 
@@ -65,11 +66,14 @@ watch(() => props.appointment,
     border-radius: 5px;
 
     cursor: pointer;
-    
+
 }
+
 .listItem:hover {
-    background-color: #add8e6; /* Slightly darker shade of lightblue */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow on hover */
+    background-color: #add8e6;
+    /* Slightly darker shade of lightblue */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* Add shadow on hover */
 }
 
 .info {
@@ -116,28 +120,9 @@ watch(() => props.appointment,
     justify-self: center;
 }
 
-
-/* @media (max-width: 1200px) {
+@media screen and (max-width: 600px) {
     .listItem {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        padding: 10px 20px;
     }
 }
-
-@media (max-width: 992px) {
-    .container {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    }
-}
-
-@media (max-width: 768px) {
-    .container {
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    }
-}
-
-@media (max-width: 576px) {
-    .container {
-        grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
-    }
-} */
 </style>
