@@ -1,6 +1,6 @@
 <template>
-    <v-card class="formContainer" style="height: 800px;">
-        <v-card-title style="text-align: center; font-weight: 600;">
+    <v-card class="formContainer">
+        <v-card-title>
             <v-icon>mdi-calendar-blank</v-icon> {{ mode }} an Appointment
         </v-card-title>
         <v-card-item>
@@ -37,8 +37,7 @@
                 <div style="font-weight: 600;">Related Appointments: {{ otherAppointmentsForContact.length }}</div>
                 <div class="appointmentList">
                     <AppointmentListItem v-for="app, i in otherAppointmentsForContact" :key="`app_${i}`"
-                        :appointment="app" :agents="agents" :contacts="[]" :showContactInfo="false">
-                    </AppointmentListItem>
+                        :appointment="app" :agents="agents" :contacts="[]" :showContactInfo="false" />
                 </div>
             </div>
 
@@ -166,11 +165,12 @@ const contactOptions = computed<Vuetify.SelectOption<string>[]>(() => {
 const otherAppointmentsForContact = computed<Appointment.Model[]>(() => {
     const currectContact = props.contacts.find(c => c.record_id == form.data.contactId);
     if (!currectContact) {
-        console.log("no currect contact")
+        //console.log("no currect contact")
         return [];
     }
     //console.log("currentContact record id", currectContact.record_id, "id", currectContact.id)
-    return props.appointments.filter(a => a.contact.includes(form.data.contactId));
+    const otherApps = props.appointments.filter(a => a.contact.includes(form.data.contactId));
+    return otherApps
 })
 
 watch(() => props.appointment,
@@ -193,6 +193,12 @@ watch(() => props.appointment,
 <style scoped>
 .formContainer {
     background-color: var(--custom-gray);
+    height: 800px;
+}
+
+.formContainer>:first-child {
+    text-align: center;
+    font-weight: 600;
 }
 
 .appointmentForm>* {

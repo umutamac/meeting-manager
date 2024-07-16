@@ -38,8 +38,8 @@ const props = withDefaults(defineProps<Props>(), { showContactInfo: true });
 const _appointment = ref<Appointment.Model>(props.appointment);
 
 const agentsForAppointment = computed(() => {
-    const agentList = [...props.agents].filter(agent => agent.appointments.map(appointmentId => appointmentId == _appointment.value.record_id));
-    return agentList
+    const agentList = [...props.agents].filter(agent => agent.appointments.includes(_appointment.value.record_id));
+    return agentList;
 })
 
 const maxString = FILTER.truncateString;
